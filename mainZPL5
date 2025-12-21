@@ -214,6 +214,17 @@ DATA: ITAB_ALV TYPE STANDARD TABLE OF str_ALV ,
       WA_ITAB_DIFF TYPE  str_ALV,
       WA_ITAB_PRCENT TYPE  str_ALV.
 
+TYPES: BEGIN OF ty_alv_key,
+         matnr       TYPE mara-matnr,
+         fiscyearper TYPE acdoca-fiscyearper,
+         ekorg       TYPE t001w-ekorg,
+       END OF ty_alv_key.
+
+DATA: lt_alv_keys TYPE HASHED TABLE OF ty_alv_key WITH UNIQUE KEY matnr fiscyearper ekorg,
+      ls_alv_key TYPE ty_alv_key,
+      lt_missing_materials TYPE HASHED TABLE OF str_ALV WITH UNIQUE KEY matnr fiscyearper ekorg,
+      ls_missing TYPE str_ALV.
+
 DATA: indx TYPE SY-TABIX,
       indx2 TYPE SY-TABIX.
 
@@ -671,6 +682,51 @@ FORM load_data.
 
 
       ENDLOOP.
+
+      CLEAR lt_alv_keys.
+      LOOP AT ITAB_ALV INTO WA_ITAB.
+        ls_alv_key-matnr = WA_ITAB-matnr.
+        ls_alv_key-fiscyearper = WA_ITAB-fiscyearper.
+        ls_alv_key-ekorg = WA_ITAB-ekorg.
+        INSERT ls_alv_key INTO TABLE lt_alv_keys.
+      ENDLOOP.
+
+      LOOP AT ITAB_ALV_NET INTO WA_ITAB_NET.
+        READ TABLE lt_alv_keys WITH KEY matnr = WA_ITAB_NET-matnr
+                                        fiscyearper = WA_ITAB_NET-fiscyearper
+                                        ekorg = WA_ITAB_NET-ekorg
+                                        TRANSPORTING NO FIELDS.
+        IF sy-subrc <> 0.
+          CLEAR ls_missing.
+          READ TABLE lt_missing_materials INTO ls_missing WITH KEY matnr       = WA_ITAB_NET-matnr
+                                                                 fiscyearper = WA_ITAB_NET-fiscyearper
+                                                                 ekorg       = WA_ITAB_NET-ekorg.
+          IF sy-subrc <> 0.
+            READ TABLE ITAB_ALV2 INTO ls_missing WITH KEY MATNR = WA_ITAB_NET-matnr
+                                                       BDATJ = WA_ITAB_NET-fiscyearper(4)
+                                                       POPER = WA_ITAB_NET-fiscyearper+4(3)
+                                                       EKORG = WA_ITAB_NET-ekorg.
+            IF sy-subrc <> 0.
+              ls_missing-matnr = WA_ITAB_NET-matnr.
+              ls_missing-ekorg = WA_ITAB_NET-ekorg.
+              ls_missing-fiscyearper = WA_ITAB_NET-fiscyearper.
+              ls_missing-bdatj = WA_ITAB_NET-fiscyearper(4).
+              ls_missing-poper = WA_ITAB_NET-fiscyearper+4(3).
+            ELSE.
+              ls_missing-fiscyearper = WA_ITAB_NET-fiscyearper.
+            ENDIF.
+            ls_missing-net = WA_ITAB_NET-net.
+            INSERT ls_missing INTO TABLE lt_missing_materials.
+          ELSE.
+            ls_missing-net = ls_missing-net + WA_ITAB_NET-net.
+            MODIFY lt_missing_materials FROM ls_missing.
+          ENDIF.
+        ENDIF.
+      ENDLOOP.
+
+      IF lt_missing_materials IS NOT INITIAL.
+        APPEND LINES OF lt_missing_materials TO ITAB_ALV.
+      ENDIF.
 
 
 
