@@ -13,7 +13,7 @@ REPORT ZPL_REPORT5.
 *&---------------------------------------------------------------------*
 
 TABLES: BSEG , MARA , MBEW , CKMLPRKEPH , TCKH3, CKMLCUR.
-  TYPE-POOLS : SLIS.
+  TYPE-POOLS : SLIS, ABAP.
 *&---------------------------------------------------------------------*
 DATA:fc       TYPE slis_t_fieldcat_alv,
      prog     TYPE syst-repid,
@@ -654,32 +654,34 @@ FORM load_data.
 
 
       LOOP AT ITAB_ALV ASSIGNING FIELD-SYMBOL(<WA_ALV>).
+        DATA(lv_found_alv2) TYPE abap_bool VALUE abap_false.
+        DATA(lv_found_net)  TYPE abap_bool VALUE abap_false.
+
+        CLEAR WA_ITAB.
         READ TABLE ITAB_ALV2 INTO WA_ITAB WITH KEY MATNR = <WA_ALV>-MATNR
                                                    BDATJ = <WA_ALV>-FISCYEARPER(4)
                                                    POPER = <WA_ALV>-FISCYEARPER+4(3)
                                                    EKORG = <WA_ALV>-EKORG.
+        IF sy-subrc = 0.
+          lv_found_alv2 = abap_true.
+          WA_ITAB-EKORG = <WA_ALV>-EKORG.
+          WA_ITAB-FISCYEARPER = <WA_ALV>-FISCYEARPER.
+          WA_ITAB-HSL = <WA_ALV>-HSL.
+        ENDIF.
 
-
-        WA_ITAB-EKORG = <WA_ALV>-EKORG.
-        WA_ITAB-FISCYEARPER = <WA_ALV>-FISCYEARPER.
-        WA_ITAB-HSL = <WA_ALV>-HSL.
-         CLEAR WA_ITAB_NET.
-
-
+        CLEAR WA_ITAB_NET.
         READ TABLE ITAB_ALV_NET INTO WA_ITAB_NET WITH KEY MATNR = <WA_ALV>-MATNR
                                                           FISCYEARPER(4) = <WA_ALV>-FISCYEARPER(4)
                                                           FISCYEARPER+4(3) = <WA_ALV>-FISCYEARPER+4(3)
                                                                  EKORG = <WA_ALV>-EKORG.
+        IF sy-subrc = 0.
+          lv_found_net = abap_true.
+          WA_ITAB-NET = WA_ITAB_NET-NET.
+        ENDIF.
 
-
-*        <WA_ALV>-NET_WEIGHT = WA_ITAB_WEIGHT-NET_WEIGHT.
-*         <WA_ALV>-NET = WA_ITAB_NET-NET.
-         WA_ITAB-NET = WA_ITAB_NET-NET.
-
-
-        MOVE-CORRESPONDING WA_ITAB to <WA_ALV>.
-
-
+        IF lv_found_alv2 = abap_true OR lv_found_net = abap_true.
+          MOVE-CORRESPONDING WA_ITAB TO <WA_ALV>.
+        ENDIF.
 
       ENDLOOP.
 
