@@ -1,3 +1,2363 @@
+*******&---------------------------------------------------------------------*
+*******& Report ZPL_REPORT4 By Shady Almurish
+*******&---------------------------------------------------------------------*
+*******&
+*******&---------------------------------------------------------------------*
+******REPORT ZPL_REPORT5.
+******
+******
+*******&---------------------------------------------------------------------*
+*******& Report ZFI021
+*******&---------------------------------------------------------------------*
+*******&
+*******&---------------------------------------------------------------------*
+******
+******TABLES: BSEG , MARA , MBEW , CKMLPRKEPH , TCKH3, CKMLCUR.
+******  TYPE-POOLS : SLIS.
+*******&---------------------------------------------------------------------*
+******DATA:fc       TYPE slis_t_fieldcat_alv,
+******     prog     TYPE syst-repid,
+******     ls_layo  TYPE slis_layout_alv,
+******     lt_evts  TYPE slis_t_event,
+******     l_text   TYPE string,
+******     srt      TYPE slis_t_sortinfo_alv,
+******     flag     TYPE flag
+******   .
+******
+******data: fieldcatalog type slis_t_fieldcat_alv with header line,
+******      gd_tab_group type slis_t_sp_group_alv,
+******      gd_layout    type slis_layout_alv,
+******      gd_repid     like sy-repid,
+******      gt_events     type slis_t_event,
+******      gd_prntparams type slis_print_alv,
+******            IDX TYPE SY-TABIX.
+******
+******
+******DATA: GT_FLDCAT TYPE STANDARD TABLE OF SLIS_FIELDCAT_ALV,
+******      GS_FLDCAT TYPE SLIS_FIELDCAT_ALV ,
+******      StrEvent TYPE SLIS_ALV_EVENT,
+******      gs_layout type slis_layout_alv .
+******
+******
+******TYPES: BEGIN OF str_ALV,
+******     MATNR TYPE  MARA-MATNR ,
+******     MATKL TYPE  MARA-MATKL,
+******     MAKTG TYPE  MAKT-MAKTG,
+******     WGBEZ TYPE  T023T-WGBEZ,
+******     MEINS TYPE  MARA-MEINS,
+******     MTART TYPE  MARA-MTART,
+******     BWKEY TYPE MBEW-BWKEY,
+******     BWTAR TYPE MBEW-BWTAR,
+******     BDATJ TYPE CKMLPRKEPH-BDATJ,
+******     POPER TYPE CKMLPRKEPH-POPER ,
+******     CURTP TYPE CKMLPRKEPH-CURTP,
+******     PRTYP TYPE CKMLPRKEPH-PRTYP,
+******     WAERS TYPE CKMLPRKEPH-WAERS,
+******     KKZST TYPE CKMLPRKEPH-KKZST,
+******     LOSGR TYPE MARC-LOSGR,
+******     LOSGR2 TYPE MARC-LOSGR,
+******
+******     KST001 TYPE CKMLPRKEPH-KST001,
+******     KST002 TYPE CKMLPRKEPH-KST002,
+******     KST003 TYPE CKMLPRKEPH-KST003,
+******     KST004 TYPE CKMLPRKEPH-KST004,
+******     KST005 TYPE CKMLPRKEPH-KST005,
+******     KST006 TYPE CKMLPRKEPH-KST006,
+******     KST007 TYPE CKMLPRKEPH-KST007,
+******     KST008 TYPE CKMLPRKEPH-KST008,
+******     KST009 TYPE CKMLPRKEPH-KST009,
+******     KST010 TYPE CKMLPRKEPH-KST010,
+******     KST011 TYPE CKMLPRKEPH-KST011,
+******     KST012 TYPE CKMLPRKEPH-KST012,
+******     KST013 TYPE CKMLPRKEPH-KST013,
+******     KST014 TYPE CKMLPRKEPH-KST014,
+******     KST015 TYPE CKMLPRKEPH-KST015,
+******     KST016 TYPE CKMLPRKEPH-KST016,
+******     KST017 TYPE CKMLPRKEPH-KST017,
+******     KST018 TYPE CKMLPRKEPH-KST018,
+******     KST019 TYPE CKMLPRKEPH-KST019,
+******     KST020 TYPE CKMLPRKEPH-KST020,
+******     KST021 TYPE CKMLPRKEPH-KST021,
+******     KST022 TYPE CKMLPRKEPH-KST022,
+******     KST023 TYPE CKMLPRKEPH-KST023,
+******     KST024 TYPE CKMLPRKEPH-KST024,
+******     KST025 TYPE CKMLPRKEPH-KST025,
+******     KST026 TYPE CKMLPRKEPH-KST026,
+******     KST027 TYPE CKMLPRKEPH-KST027,
+******     KST028 TYPE CKMLPRKEPH-KST028,
+******     KST029 TYPE CKMLPRKEPH-KST029,
+******     KST030 TYPE CKMLPRKEPH-KST030,
+******     KST031 TYPE CKMLPRKEPH-KST031,
+******     KST032 TYPE CKMLPRKEPH-KST032,
+******     KST033 TYPE CKMLPRKEPH-KST033,
+******     KST034 TYPE CKMLPRKEPH-KST034,
+******     KST035 TYPE CKMLPRKEPH-KST035,
+******     KST036 TYPE CKMLPRKEPH-KST036,
+******     KST037 TYPE CKMLPRKEPH-KST037,
+******     KST038 TYPE CKMLPRKEPH-KST038,
+******     KST039 TYPE CKMLPRKEPH-KST039,
+******     KST040 TYPE CKMLPRKEPH-KST040,
+******
+******     KALNR TYPE CKMLPRKEPH-KALNR ,
+*******     QTY_REVALUATION TYPE MLDOC-QUANT,
+*******     QTY_RECEIPTS TYPE MLDOC-QUANT,
+*******     QTY_CONSUMPTION TYPE MLDOC-QUANT,
+*******     QTY_CONS_PROD TYPE MLDOC-QUANT,
+*******     QTY_STRANSFER TYPE MLDOC-QUANT,
+******
+******     QTY_ZUB TYPE MLDOC-QUANT,
+******     QTY_ZUBF TYPE MLDOC-QUANT,
+******     QTY_ZUBB TYPE MLDOC-QUANT,
+******     QTY_ZUBU TYPE MLDOC-QUANT,
+******     QTY_ZUBUBM TYPE MLDOC-QUANT,
+******     QTY_ZUBL TYPE MLDOC-QUANT,
+******
+******     QTY_RECEIPTS TYPE MLDOC-QUANT,
+******
+******     QTY_VNV TYPE MLDOC-QUANT,
+******     QTY_VNVEAU TYPE MLDOC-QUANT,
+******     QTY_VNVF TYPE MLDOC-QUANT,
+******     QTY_VNVK TYPE MLDOC-QUANT,
+******     QTY_VNVU TYPE MLDOC-QUANT,
+******     QTY_VUBM TYPE MLDOC-QUANT,
+******
+******
+******     QTY_CONSUMPTION TYPE MLDOC-QUANT,
+******
+******     QTY_CONSUMPTION1 TYPE MLDOC-QUANT,
+******     QTY_CONSUMPTION2 TYPE MLDOC-QUANT,
+******
+******
+******     NETWR TYPE VBRP-NETWR,
+******     TOT_NETWR TYPE VBRP-NETWR,
+******
+******     QTY_BEGIN_INV TYPE MLDOC-QUANT,
+******     QTY_END_INV TYPE MLDOC-QUANT,
+******
+******     WIGHT TYPE BRGEW,
+******     QTY_TON TYPE P DECIMALS 2,
+******
+******    TOTAL TYPE CKMLPRKEPH-KST040,
+******
+******    NAME1 TYPE T001W-NAME1,
+******    EKORG TYPE T001W-EKORG,
+******    NAME2 TYPE ADRC-NAME2,
+******    BUKRS TYPE VBRK-BUKRS,
+******    FKART TYPE VBRK-FKART,
+******    FKART_DESC TYPE TVFKT-VTEXT,
+******    PSTYV TYPE VBRP-PSTYV,
+******    FKDAT TYPE VBRK-FKDAT,
+******    VKORG TYPE VBRK-VKORG,
+******    VKORG_DESC TYPE TVKOT-VTEXT,
+******    NET TYPE VBRP-NETWR,
+******    NET2 TYPE P DECIMALS 2,
+******    GROSS_WEIGHT TYPE VBRP-BRGEW,
+******    NET_WEIGHT TYPE VBRP-NTGEW,
+******    NET_WEIGHT_TON TYPE P DECIMALS 3,
+******    PLTYP TYPE VBRP-PLTYP_AUFT,
+******    PTEXT TYPE  text20,
+******    VTWEG TYPE VBRK-VTWEG,
+******    VTEXT TYPE TVTWT-VTEXT,
+******    SPART TYPE VBRK-SPART,
+******    SPART_N TYPE TSPAT-VTEXT,
+******    KUNRG TYPE VBRK-KUNRG,
+******    KUNRG_N TYPE KNA1-NAME1,
+******    SOLD_TO_PARTY TYPE VBRK-KUNAG,
+******    SOLD_N TYPE KNA1-NAME1,
+******    SHIP_TO_PARTY TYPE VBRK-KUNWE,
+******    SHIP_N TYPE KNA1-NAME1,
+******    QUANTITY TYPE VBRP-FKIMG,
+******    MEINS_B_BU TYPE VBRP-MEINS,
+******    MENG_B_BU TYPE VBRP-FKLMG,
+******    MENG_B_BU_TOT TYPE VBRP-FKLMG,
+******    VBELN TYPE VBRP-VBELN,
+******    VBELN_C TYPE vbeln_vf,
+******    POSNR TYPE VBRP-POSNR,
+******    VKBUR TYPE VBRP-VKBUR,
+*******    VKBUR_DESC TYPE TVKBZT-BEZEI,
+******    WERKS TYPE VBRP-WERKS,
+******    ARKTX TYPE VBRP-ARKTX,
+******    MONTH TYPE CHAR7,
+******    LGORT TYPE VBRP-LGORT,
+******    KURSK TYPE VBRP-KURSK,
+******    REGIO TYPE VBRP-REGIO_AUFT,
+******    BZIRK_AUFT TYPE VBRP-BZIRK_AUFT,
+******    GEWEI TYPE VBRP-GEWEI,
+******    AUTYP TYPE VBRP-AUTYP,
+******    VBTYP_ANA TYPE VBRP-VBTYP_ANA,
+******    KUNWE_ANA TYPE VBRP-KUNWE_ANA,
+******    MVGR3 TYPE VBRP-MVGR3,
+******    VTWEG_AUFT TYPE VBRP-VTWEG_AUFT,
+******    VF_STATUS_ANA TYPE VBRP-VF_STATUS_ANA,
+******    VKORG_AUFT TYPE VBRP-VKORG_AUFT,
+******    wert2          TYPE tkchw-wert1,
+******    prodh          TYPE  mvke-prodh,
+******    catg1          TYPE char7,
+******    RACCT TYPE ACDOCA-RACCT ,
+******   RLDNR TYPE ACDOCA-RLDNR ,
+******    TXT50    TYPE SKAT-TXT50,
+******    shkzg typE vbrp-shkzg,
+******    SELLING_COST type P DECIMALS 2,
+******    HSL type P DECIMALS 2,
+******    FISCYEARPER TYPE ACDOCA-FISCYEARPER,
+******
+******
+******  END OF str_ALV.
+******
+******DATA: ITAB_ALV TYPE STANDARD TABLE OF str_ALV ,
+******      ITAB_ALV2 TYPE STANDARD TABLE OF str_ALV ,
+******      ITAB_ALV_NET TYPE STANDARD TABLE OF str_ALV ,
+******      ITAB_ALV_RESULT TYPE STANDARD TABLE OF str_ALV ,
+******      WA_ITAB TYPE  str_ALV,
+******      WA_ITAB_NET TYPE  str_ALV,
+******      WA_ITAB_last TYPE  str_ALV,
+******      WA_ITAB_DIFF TYPE  str_ALV,
+******      WA_ITAB_PRCENT TYPE  str_ALV.
+******
+******DATA: indx TYPE SY-TABIX,
+******      indx2 TYPE SY-TABIX.
+******
+******TYPES: BEGIN OF ty_vbrp_data,
+******         fklmg      TYPE vbrp-fklmg,
+******         fkimg      TYPE vbrp-fkimg,
+******         autyp      TYPE vbrp-autyp,
+******         bukrs      TYPE vbrp-bukrs_ana,
+******         fktyp_ana  TYPE vbrp-fktyp_ana,
+******         pstyv      TYPE vbrp-pstyv,
+******         fkdat      TYPE vbrk-fkdat,
+******         netwr      TYPE vbrp-netwr,
+******         brgew      TYPE vbrp-brgew,
+******         ntgew      TYPE vbrp-ntgew,
+******         pltyp      TYPE vbrp-pltyp_auft,
+******         vtweg_ana  TYPE vbrp-vtweg_ana,
+******         meins      TYPE vbrp-meins,
+******         vbeln      TYPE vbrp-vbeln,
+******         posnr      TYPE vbrp-posnr,
+******         vkbur      TYPE vbrp-vkbur,
+******         werks      TYPE vbrp-werks,
+******         arktx      TYPE vbrp-arktx,
+******         lgort      TYPE vbrp-lgort,
+******         kursk      TYPE vbrp-kursk,
+******         vgbel      TYPE vbrp-vgbel,
+******         vgpos      TYPE vbrp-vgpos,
+******         bzirk      TYPE vbrp-bzirk_auft,
+******         regio      TYPE vbrp-regio_auft,
+******         vkgrp      TYPE vbrp-vkgrp,
+******         knumv      TYPE vbrp-knumv_ana,
+******         gewei      TYPE vbrp-gewei,
+******         spart_item TYPE vbrp-spart,
+******         shkzg      TYPE vbrp-shkzg,
+******         vbtyp      TYPE vbrp-vbtyp_ana,
+******         kunwe_ana  TYPE vbrp-kunwe_ana,
+******         mvgr3      TYPE vbrp-mvgr3,
+******         vtweg_auft TYPE vbrp-vtweg_auft,
+******         vf_status  TYPE vbrp-vf_status_ana,
+******         vkorg_item TYPE vbrp-vkorg_auft,
+******         vkorg  TYPE vbrk-vkorg,
+******         vtweg  TYPE vbrk-vtweg,
+******         spart_hdr  TYPE vbrk-spart,
+******         kunrg      TYPE vbrk-kunrg,
+******         kunag      TYPE vbrk-kunag,
+******         kunwe      TYPE vbrk-kunwe,
+*******         stblg      TYPE vbrk-stblg,
+******         fkart_hdr  TYPE vbrk-fkart,
+******         bukrs_hdr  TYPE vbrk-bukrs,
+******         RACCT TYPE ACDOCA-RACCT ,
+******         RLDNR TYPE ACDOCA-RLDNR ,
+******         TXT50    TYPE SKAT-TXT50,
+******         matnr    TYPE MARA-MATNR ,
+******       END OF ty_vbrp_data.
+******
+******DATA: SD_TAB TYPE STANDARD TABLE OF ty_vbrp_data WITH EMPTY KEY.
+******
+******
+******RANGES: P_PRTYP for CKMLPRKEPH-PRTYP .
+******
+****** DATA INVTXT TYPE char200.
+****** DATA cond TYPE char10.
+****** DATA: ELEMT TYPE TCKH3-ELEMT,
+******       EL_HV TYPE TCKH3-EL_HV ,
+******       TXELE TYPE TCKH1-TXELE .
+******
+******Data KKZST TYPE CKMLPRKEPH-KKZST .  " Level
+******
+*******&---------------------------------------------------------------------*
+******CONSTANTS: gc_true TYPE sap_bool VALUE 'X'.
+*******&---------------------------------------------------------------------*
+******
+******
+****** TYPES: BEGIN OF str,
+******            ELEMT TYPE TCKH3-ELEMT ,
+******            EL_HV TYPE TCKH3-EL_HV ,
+******            TXELE TYPE TCKH1-TXELE,
+******            END OF str.
+******
+******            DATA: it TYPE STANDARD TABLE OF str ,
+******                  wa TYPE str.
+******
+******
+******DATA: STR_DYNAMIC type string,
+******      STR_DYNAMIC1 type string,
+******      STR_DYNAMIC2 type string,
+******      STR_DYNAMIC3 type string.
+******
+******FIELD-SYMBOLS: <FS_DYNAMIC> type any,
+******               <FS_DYNAMIC1> type any,
+******               <FS_DYNAMIC2> type any,
+******               <FS_DYNAMIC3> type any.
+******
+******DATA: i type i value 1.
+******data zero00 TYPE char2.
+******
+******
+******
+******SELECTION-SCREEN BEGIN OF BLOCK B3 WITH FRAME TITLE TEXT-083 .
+******
+******* PARAMETERS COMP TYPE BUKRS OBLIGATORY DEFAULT '1200'.
+****** SELECT-OPTIONS COMP FOR BSEG-BUKRS OBLIGATORY MEMORY ID COMP.
+******* SELECT-OPTIONS VKORG FOR -VKROG .
+****** SELECT-OPTIONS BWKEY FOR  MBEW-BWKEY MEMORY ID BWKEY." OBLIGATORY . "Valuation area
+****** SELECT-OPTIONS MATNR FOR  MARA-MATNR  MEMORY ID MATNR . "Material
+****** SELECT-OPTIONS BWTAR FOR  MBEW-BWTAR MEMORY ID BWTAR . "Valuation Type
+****** SELECT-OPTIONS MTART FOR MARA-MTART DEFAULT 'ZFIN'  . "Material type
+******
+****** SELECT-OPTIONS BDATJ FOR CKMLPRKEPH-BDATJ OBLIGATORY DEFAULT SY-DATUM(4).  "yaer
+****** SELECT-OPTIONS POPER FOR CKMLPRKEPH-POPER OBLIGATORY DEFAULT SY-DATUM+4(2) .  " month
+****** SELECT-OPTIONS CURTP FOR CKMLCUR-CURTP OBLIGATORY DEFAULT '10' .  " curr type
+******
+****** PARAMETERS SPRAS TYPE MAKT-SPRAS DEFAULT 'E' .
+******
+****** PARAMETERS X1000 TYPE char10 DEFAULT '1000' OBLIGATORY .
+******* PARAMETERS FulFix TYPE char1 DEFAULT '1' .
+******
+******* PARAMETERS GJAHR TYPE BSEG-GJAHR OBLIGATORY .
+******* SELECT-OPTIONS H_MONAT FOR BSEG-H_MONAT OBLIGATORY .
+******
+******SELECTION-SCREEN END OF BLOCK B3.
+******
+*******SELECTION-SCREEN BEGIN OF BLOCK B2 WITH FRAME TITLE TEXT-082.
+*******
+*******  SELECTION-SCREEN begin of LINE.
+*******    SELECTION-SCREEN COMMENT 2(20) TEXT-008 For FIELD ALL2.
+*******      PARAMETERS: ALL2 RADIOBUTTON GROUP c DEFAULT 'X'.
+*******    SELECTION-SCREEN COMMENT 30(20) TEXT-009 For FIELD X2.
+*******      PARAMETERS: X2 RADIOBUTTON GROUP c.
+*******    SELECTION-SCREEN COMMENT 60(20) TEXT-010 For FIELD S2.
+*******      PARAMETERS: S2 RADIOBUTTON GROUP c.
+*******  SELECTION-SCREEN : END OF LINE.
+*******
+*******SELECTION-SCREEN END OF BLOCK B2.
+*******
+*******SELECTION-SCREEN BEGIN OF BLOCK B4 WITH FRAME TITLE TEXT-084.
+********
+*******  SELECTION-SCREEN begin of LINE.
+*******    SELECTION-SCREEN COMMENT 2(20) TEXT-006 For FIELD FuCost.
+*******      PARAMETERS: FuCost RADIOBUTTON GROUP B DEFAULT 'X'.
+*******    SELECTION-SCREEN COMMENT 30(20) TEXT-007 For FIELD FixCost.
+*******      PARAMETERS: FixCost RADIOBUTTON GROUP B.
+*******
+*******  SELECTION-SCREEN : END OF LINE.
+*******
+*******SELECTION-SCREEN END OF BLOCK B4.
+*******
+******
+******SELECTION-SCREEN BEGIN OF BLOCK B5 WITH FRAME TITLE TEXT-085.
+******
+******  SELECTION-SCREEN begin of LINE.
+*******    SELECTION-SCREEN COMMENT 2(20) TEXT-003 For FIELD ALL.
+*******      PARAMETERS: ALL RADIOBUTTON GROUP a DEFAULT 'X'.
+******    SELECTION-SCREEN COMMENT 30(20)  TEXT-004 For FIELD V.
+******      PARAMETERS: V RADIOBUTTON GROUP a.
+******    SELECTION-SCREEN COMMENT 60(20) TEXT-005 For FIELD S.
+******      PARAMETERS: S RADIOBUTTON GROUP a.
+******  SELECTION-SCREEN : END OF LINE.
+******
+*******SELECT-OPTIONS PRTYP FOR CKMLPRKEPH-PRTYP .  " price type
+******
+******SELECTION-SCREEN END OF BLOCK B5.
+******
+******SELECTION-SCREEN BEGIN OF BLOCK hidden_block.
+******  PARAMETERS:
+*******    ALL   TYPE c   NO-DISPLAY DEFAULT 'X',
+*******    V      TYPE c NO-DISPLAY,
+*******    S       TYPE c NO-DISPLAY,
+******    ALL2   TYPE c   NO-DISPLAY DEFAULT 'X',
+******    X2      TYPE c   NO-DISPLAY,
+******    S2      TYPE c   NO-DISPLAY,
+******    FuCost  TYPE c  NO-DISPLAY DEFAULT 'X',
+******    FixCost TYPE c  NO-DISPLAY.
+******SELECTION-SCREEN END OF BLOCK hidden_block.
+******
+******INITIALIZATION.
+******
+******
+******
+*********-----------------------------------------------------------------------***
+*******&---------------------------------------------------------------------*
+******
+******
+*******Start-of-selection.
+******START-OF-SELECTION.
+******
+******  prog = sy-repid. "Program Name
+******
+******DATA AUTHORITY TYPE char1 VALUE 'X'.
+******
+****** SELECT T001~BUKRS INTO TABLE  @DATA(range_comp_codes) from T001  WHERE  T001~BUKRS in @COMP.
+****** LOOP AT range_comp_codes ASSIGNING FIELD-SYMBOL(<line>).
+******   AUTHORITY-CHECK OBJECT 'M_MATE_BUK'
+******        ID 'BUKRS' FIELD <line>-BUKRS.
+******    IF SY-SUBRC <> 0.
+******      AUTHORITY = ''.
+******    ENDIF.
+****** ENDLOOP.
+******
+******
+****** IF AUTHORITY = 'X'.
+******
+******
+******      PERFORM load_data.
+******      PERFORM BUIILD_FIELDCATALOG.
+******      PERFORM build_layout.
+******      PERFORM alv_show.
+******
+******ELSE.
+******  message 'لا يوجد لديك صلاحية' TYPE 'I'.
+******ENDIF.
+******
+******end-OF-SELECTION.
+******
+******
+*******---------------------------------------------------------------------------
+******
+******FORM load_data.
+******
+*******  BREAK malabsi.
+******
+******
+******        if ALL2 = 'X'.
+******          KKZST = ''.
+******        ELSEIF X2 = 'X'.
+******          KKZST = 'X'.
+******        ELSEIF S2 = 'X'.
+******          KKZST = 'S'.
+******        ENDIF.
+******
+******
+******
+*******        if ALL = 'X'.
+*******          P_PRTYP-sign = 'I' . P_PRTYP-option = 'BT' . P_PRTYP-low = 'S'. P_PRTYP-HIGH = 'V'.  APPEND P_PRTYP.
+*******        ELSE
+******          IF S  = 'X'.
+******          P_PRTYP-sign = 'I' . P_PRTYP-option = 'EQ' . P_PRTYP-low = 'S'.  APPEND P_PRTYP.
+******        ELSEIF V  = 'X'.
+******          P_PRTYP-sign = 'I' . P_PRTYP-option = 'EQ' . P_PRTYP-low = 'V'.  APPEND P_PRTYP.
+******        endif.
+******
+******        "get MONTH_YAER
+******        data MONTH_YAER type range of MATDOC-GJPER.
+******        select DISTINCT 'I' AS sign, 'EQ' AS option, GJPER AS low into corresponding fields of table @MONTH_YAER
+******        from MATDOC WHERE GJAHR in @BDATJ and MONTH_BUDAT in @POPER.
+******        "end get MONTH_YAER\
+******
+******
+******
+******
+******
+*******        main select
+******
+******   SELECT          ACDOCA~RBUKRS as EKORG,
+******                   ACDOCA~matnr ,
+******                   ACDOCA~FISCYEARPER,
+******                  " ACDOCA~RACCT ,
+******                  " SKAT~TXT50,
+******
+******                   "ACDOCA~RLDNR,
+******                  sum( ACDOCA~HSL ) as HSL
+******
+******     INTO CORRESPONDING FIELDS OF TABLE @ITAB_ALV
+******              FROM ACDOCA
+*******              LEFT OUTER JOIN VBRK ON ACDOCA~BELNR  = VBRK~BELNR AND ACDOCA~RBUKRS = VBRK~BUKRS AND ACDOCA~GJAHR  = VBRK~GJAHR
+*******              LEFT JOIN  VBRP  ON VBRP~VBELN  = VBRK~VBELN AND ACDOCA~AWITEM = VBRP~POSNR
+******
+******
+******          LEFT  JOIN SKAT AS SKAT ON  SKAT~SAKNR = ACDOCA~RACCT
+******                          AND SKAT~SPRAS = 'E'
+******                          AND ( SKAT~KTOPL = 'OCOA'  or SKAT~KTOPL = '1000' )
+******             WHERE
+******         ACDOCA~FISCYEARPER in @MONTH_YAER " = '2023012'
+******         AND ACDOCA~RACCT IN ( '4100060000', '4100040000', '6010080000', '6010080001', '6010010000',
+******                                                  '6010020000', '6010030000', '6010040000', '6010070000', '6010100000',
+******                                                  '4105040000', '4105060000', '4105090000', '6010120000', '6015010000',
+******                                                  '6015020000', '6100030000', '4100090000', '6100010000', '6100020000',
+******                                                  '6100060000', '5720010000' )
+******         AND ACDOCA~RBUKRS in @COMP
+******
+******         GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS
+******      .
+******
+******
+******
+******
+******
+******
+******      SELECT          ACDOCA~RBUKRS as EKORG,
+******                   ACDOCA~matnr ,
+******                   ACDOCA~FISCYEARPER,
+******                  " ACDOCA~RACCT ,
+******                  " SKAT~TXT50,
+******
+******                   "ACDOCA~RLDNR,
+******                  sum( ACDOCA~HSL ) as NET
+******
+******     INTO CORRESPONDING FIELDS OF TABLE @ITAB_ALV_NET
+******              FROM ACDOCA
+*******              LEFT OUTER JOIN VBRK ON ACDOCA~BELNR  = VBRK~BELNR AND ACDOCA~RBUKRS = VBRK~BUKRS AND ACDOCA~GJAHR  = VBRK~GJAHR
+*******              LEFT JOIN  VBRP  ON VBRP~VBELN  = VBRK~VBELN AND ACDOCA~AWITEM = VBRP~POSNR
+******
+******
+******          LEFT  JOIN SKAT AS SKAT ON  SKAT~SAKNR = ACDOCA~RACCT
+******                          AND SKAT~SPRAS = 'E'
+******                          AND ( SKAT~KTOPL = 'OCOA'  or SKAT~KTOPL = '1000' )
+******
+******
+******             WHERE
+******         ACDOCA~FISCYEARPER in @MONTH_YAER " = '2023012'
+******         AND ACDOCA~RACCT IN ( '4010010000', '4020010000', '4020030000', '4050010000', '4040020000', '4040010000',
+******                                                  '4045010000', '4070010000', '4015010000', '4055010000', '4025010000', '4030010000',
+******                                                  '4035010000', '4035030000', '4040040000', '4060010000', '4065010000', '4070040000',
+******                                                  '4100030000', '4100070000', '4100080000', '4100110000', '4105080000', '4100100000' )
+******         AND ACDOCA~RBUKRS in @COMP
+******
+******         GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS
+******
+******
+******      .
+******
+******
+******
+******
+******        SELECT MARA~MATNR ,MARA~MATKL  ,MARA~MTART ,T023T~WGBEZ ,MAKT~MAKTG,KEKO~MEINS,"MARA~MEINS,
+******             MBEW~BWKEY ,MBEW~BWTAR ,KEKO~LOSGR, KEKO~LOSGR as LOSGR2, "MARC~LOSGR,
+******
+******             MBEW~VPRSV as PRTYP , KEKO~POPER , KEKO~BDATJ ,  KEKO~FWAER_KPF AS WAERS,
+******             KEPH~KALNR ,
+******             ",KEPH~BDATJ ,KEPH~POPER ,KEPH~CURTP ,KEPH~PRTYP ,KEPH~WAERS ,KEPH~KKZST,
+******
+******             KEPH~KST001 ,KEPH~KST002 ,KEPH~KST003 ,KEPH~KST004 ,KEPH~KST005 ,KEPH~KST006 ,KEPH~KST007,
+******             KEPH~KST008 ,KEPH~KST009 ,KEPH~KST010 ,KEPH~KST011 ,KEPH~KST012 ,KEPH~KST013 ,KEPH~KST014,
+******             KEPH~KST015 ,KEPH~KST016 ,KEPH~KST017 ,KEPH~KST018 ,KEPH~KST019 ,KEPH~KST020 ,KEPH~KST021,
+******             KEPH~KST022 ,KEPH~KST023 ,KEPH~KST024 ,KEPH~KST025 ,KEPH~KST026 ,KEPH~KST027 ,KEPH~KST028,
+******             KEPH~KST029 ,KEPH~KST030 ,KEPH~KST031 ,KEPH~KST032 ,KEPH~KST033 ,KEPH~KST034 ,KEPH~KST035,
+******             KEPH~KST036 ,KEPH~KST037 ,KEPH~KST038 ,KEPH~KST039 ,KEPH~KST040 ,
+******
+******             T001W~NAME1, T001W~EKORG , ADRC~NAME2 , T001W~VKORG
+******        INTO CORRESPONDING FIELDS OF TABLE @ITAB_ALV2
+******        FROM MARA
+******        INNER JOIN MBEW  on ( MARA~MATNR  =  MBEW~MATNR )
+******        "INNER JOIN MARC  on ( MARC~MATNR  =  MBEW~MATNR AND MARC~WERKS = MBEW~BWKEY )
+******        INNER JOIN KEPH on ( MBEW~KALN1 = KEPH~KALNR  )
+******        INNER JOIN KEKO on ( KEPH~BWVAR = KEKO~BWVAR and KEPH~BZOBJ = KEKO~BZOBJ and KEPH~KADKY = KEKO~KADKY
+******                             and KEPH~KALKA = KEKO~KALKA and KEPH~KALNR = KEKO~KALNR and KEPH~TVERS = KEKO~TVERS
+******        "and KEPH~CURTP = KEKO~CURTP
+******        "and KEPH~PRTYP = KEKO~PRTYP
+******        )
+******
+******        INNER JOIN T001W on ( T001W~WERKS = MBEW~BWKEY )
+******        LEFT OUTER JOIN T001 ON ( T001~BUKRS = T001W~EKORG and T001~SPRAS = 'E' ) " @SPRAS )
+******        LEFT OUTER JOIN ADRC ON ( ADRC~ADDRNUMBER = T001~ADRNR )
+******
+******        LEFT OUTER JOIN MAKT on ( MARA~MATNR  =  MAKT~MATNR AND MAKT~SPRAS = @SPRAS )
+******        LEFT OUTER JOIN T023T on ( MARA~MATKL = T023T~MATKL AND T023T~SPRAS = @SPRAS )
+******        WHERE MARA~MATNR in @MATNR
+******          AND MARA~MTART in @MTART
+******          AND MBEW~BWKEY in @BWKEY
+******          AND MBEW~BWKEY in ( '1101', '1201', '1301' )
+******          AND T001W~EKORG in @COMP
+******          AND MBEW~BWTAR in @BWTAR
+******
+******          "AND KEPH~KADKY in @dats
+******          AND KEKO~POPER in @POPER
+******          and KEKO~BDATJ in @BDATJ
+*******          AND T001W~VKORG in @VKORG
+*******          AND KEPH~BDATJ in @BDATJ
+*******          AND KEPH~POPER in @POPER
+*******          AND KEPH~CURTP in @CURTP
+*******          AND KEPH~PRTYP in @P_PRTYP " PRTYP
+******          AND KEPH~KKZST = @KKZST
+******          ORDER BY T001W~EKORG , MBEW~BWKEY,
+******                   MARA~MATKL, MARA~MATNR,
+******                   KEKO~BDATJ ,KEKO~POPER
+*******                   KEPH~CURTP, KEPH~PRTYP
+******           .
+******
+******       "end 1101 mahdi
+******
+******
+******
+******
+******      SELECT MARA~MATNR ,MARA~MATKL  ,MARA~MTART ,T023T~WGBEZ ,MAKT~MAKTG,CKMLPRKEKO~MEINS,"MARA~MEINS,
+******             MBEW~BWKEY ,MBEW~BWTAR ,CKMLPRKEKO~LOSGR,  CKMLPRKEKO~LOSGR as LOSGR2 , "MARC~LOSGR,
+******
+******             CKMLPRKEPH~KALNR ,CKMLPRKEPH~BDATJ ,CKMLPRKEPH~POPER ,CKMLPRKEPH~CURTP ,CKMLPRKEPH~PRTYP ,CKMLPRKEPH~WAERS ,CKMLPRKEPH~KKZST,
+******
+******             CKMLPRKEPH~KST001 ,CKMLPRKEPH~KST002 ,CKMLPRKEPH~KST003 ,CKMLPRKEPH~KST004 ,CKMLPRKEPH~KST005 ,CKMLPRKEPH~KST006 ,CKMLPRKEPH~KST007,
+******             CKMLPRKEPH~KST008 ,CKMLPRKEPH~KST009 ,CKMLPRKEPH~KST010 ,CKMLPRKEPH~KST011 ,CKMLPRKEPH~KST012 ,CKMLPRKEPH~KST013 ,CKMLPRKEPH~KST014,
+******             CKMLPRKEPH~KST015 ,CKMLPRKEPH~KST016 ,CKMLPRKEPH~KST017 ,CKMLPRKEPH~KST018 ,CKMLPRKEPH~KST019 ,CKMLPRKEPH~KST020 ,CKMLPRKEPH~KST021,
+******             CKMLPRKEPH~KST022 ,CKMLPRKEPH~KST023 ,CKMLPRKEPH~KST024 ,CKMLPRKEPH~KST025 ,CKMLPRKEPH~KST026 ,CKMLPRKEPH~KST027 ,CKMLPRKEPH~KST028,
+******             CKMLPRKEPH~KST029 ,CKMLPRKEPH~KST030 ,CKMLPRKEPH~KST031 ,CKMLPRKEPH~KST032 ,CKMLPRKEPH~KST033 ,CKMLPRKEPH~KST034 ,CKMLPRKEPH~KST035,
+******             CKMLPRKEPH~KST036 ,CKMLPRKEPH~KST037 ,CKMLPRKEPH~KST038 ,CKMLPRKEPH~KST039 ,CKMLPRKEPH~KST040 ,
+******
+******             T001W~NAME1, T001W~EKORG , ADRC~NAME2
+******        "INTO CORRESPONDING FIELDS OF TABLE @ITAB_ALV
+******        APPENDING CORRESPONDING FIELDS OF TABLE @ITAB_ALV2
+******        FROM MARA
+******        INNER JOIN MBEW  on ( MARA~MATNR  =  MBEW~MATNR )
+******        "INNER JOIN MARC  on ( MARC~MATNR  =  MBEW~MATNR AND MARC~WERKS = MBEW~BWKEY )
+******        INNER JOIN CKMLPRKEPH on ( MBEW~KALN1 = CKMLPRKEPH~KALNR  )
+******        INNER JOIN CKMLPRKEKO on ( CKMLPRKEPH~KALNR = CKMLPRKEKO~KALNR and CKMLPRKEPH~BDATJ = CKMLPRKEKO~BDATJ and CKMLPRKEPH~POPER = CKMLPRKEKO~POPER and CKMLPRKEPH~CURTP = CKMLPRKEKO~CURTP and CKMLPRKEPH~PRTYP = CKMLPRKEKO~PRTYP )
+******
+******        INNER JOIN T001W on ( T001W~WERKS = MBEW~BWKEY )
+******        LEFT OUTER JOIN T001 ON ( T001~BUKRS = T001W~EKORG and T001~SPRAS = 'E' ) " @SPRAS )
+******        LEFT OUTER JOIN ADRC ON ( ADRC~ADDRNUMBER = T001~ADRNR )
+******
+******        LEFT OUTER JOIN MAKT on ( MARA~MATNR  =  MAKT~MATNR AND MAKT~SPRAS = @SPRAS )
+******        LEFT OUTER JOIN T023T on ( MARA~MATKL = T023T~MATKL AND T023T~SPRAS = @SPRAS )
+******        WHERE MARA~MATNR in @MATNR
+******          AND MARA~MTART in @MTART
+******          AND MBEW~BWKEY in @BWKEY
+******          AND T001W~EKORG in @COMP
+******          AND MBEW~BWTAR in @BWTAR
+******          AND CKMLPRKEPH~BDATJ in @BDATJ
+******          AND CKMLPRKEPH~POPER in @POPER
+******          AND CKMLPRKEPH~CURTP in @CURTP
+******          AND CKMLPRKEPH~PRTYP in @P_PRTYP " PRTYP
+******          AND CKMLPRKEPH~KKZST = @KKZST
+******          ORDER BY T001W~EKORG , MBEW~BWKEY,
+******                   MARA~MATKL, MARA~MATNR,
+******                   CKMLPRKEPH~BDATJ ,CKMLPRKEPH~POPER,
+******                   CKMLPRKEPH~CURTP, CKMLPRKEPH~PRTYP
+******            .
+******
+******
+******
+******
+******      LOOP AT ITAB_ALV ASSIGNING FIELD-SYMBOL(<WA_ALV>).
+******        READ TABLE ITAB_ALV2 INTO WA_ITAB WITH KEY MATNR = <WA_ALV>-MATNR
+******                                                   BDATJ = <WA_ALV>-FISCYEARPER(4)
+******                                                   POPER = <WA_ALV>-FISCYEARPER+4(3)
+******                                                   EKORG = <WA_ALV>-EKORG.
+******
+******
+******        WA_ITAB-EKORG = <WA_ALV>-EKORG.
+******        WA_ITAB-FISCYEARPER = <WA_ALV>-FISCYEARPER.
+******        WA_ITAB-HSL = <WA_ALV>-HSL.
+******         CLEAR WA_ITAB_NET.
+******
+******
+******        READ TABLE ITAB_ALV_NET INTO WA_ITAB_NET WITH KEY MATNR = <WA_ALV>-MATNR
+******                                                          FISCYEARPER(4) = <WA_ALV>-FISCYEARPER(4)
+******                                                          FISCYEARPER+4(3) = <WA_ALV>-FISCYEARPER+4(3)
+******                                                                 EKORG = <WA_ALV>-EKORG.
+******
+******
+*******        <WA_ALV>-NET_WEIGHT = WA_ITAB_WEIGHT-NET_WEIGHT.
+*******         <WA_ALV>-NET = WA_ITAB_NET-NET.
+******         WA_ITAB-NET = WA_ITAB_NET-NET.
+******
+******
+******        MOVE-CORRESPONDING WA_ITAB to <WA_ALV>.
+******
+******
+******
+******      ENDLOOP.
+******
+******
+******
+******
+******       "1101 mahdi
+*******
+******
+******
+*******BREAK malabsi .
+******        DATA:   FDATS TYPE  SY-DATUM ,
+******                TDATS TYPE  SY-DATUM ,
+******                SDDATS TYPE  SY-DATUM.
+******
+******        DATA VKBUR TYPE VBRP-VKBUR.
+******
+******
+******        LOOP AT ITAB_ALV INTO WA_ITAB .
+******           indx = SY-TABIX.
+******
+******           CONCATENATE  WA_ITAB-BDATJ WA_ITAB-POPER+1(2) '01' INTO SDDATS.
+******
+******           CALL FUNCTION 'HR_JP_MONTH_BEGIN_END_DATE'
+******              EXPORTING
+******                  iv_date = SDDATS
+******              IMPORTING
+******                  EV_MONTH_BEGIN_DATE = FDATS
+******                  EV_MONTH_END_DATE   = TDATS.
+******
+******
+******            select VBRP~NETWR,
+******              VBRP~FKLMG,
+******               VBRP~AUTYP,
+******               VF_STATUS_ANA ,
+******              VBRP~PLTYP_AUFT AS PLTYP,
+******              VBRP~VTWEG_ANA,
+******              VBRP~VKBUR,
+******               vbrp~vkorg_auft
+******              INTO TABLE @DATA(SD_TAB)
+******              from VBRP
+******             WHERE VBRP~AUTYP IN ( 'V' , 'C' , 'I' , 'H', 'K' )
+******               AND VBRP~FKDAT_ANA BETWEEN @FDATS AND @TDATS
+******               AND VBRP~MATNR =  @WA_ITAB-MATNR
+******               AND FKTYP_ANA IN ( 'L' , 'I' )
+******               and VBRP~WERKS =  @WA_ITAB-BWKEY
+******               and BUKRS_ANA =   @WA_ITAB-EKORG
+******              .
+******
+******
+******               IF WA_ITAB-EKORG = '2400'.
+******                   CLEAR VKBUR .
+******                   CONCATENATE '410' WA_ITAB-BWKEY+3(1) into VKBUR.
+******
+******                   select VBRP~NETWR, VBRP~FKLMG, VBRP~AUTYP, VF_STATUS_ANA
+******                     APPENDING TABLE @SD_TAB
+******                     from VBRP
+******                     WHERE VBRP~AUTYP IN ( 'V' , 'C' , 'I' , 'H', 'K' )
+******                       AND VBRP~FKDAT_ANA BETWEEN @FDATS AND @TDATS
+******                       AND VBRP~MATNR =  @WA_ITAB-MATNR
+******                       AND FKTYP_ANA IN ( 'L' , 'I' )
+******                       and VBRP~WERKS <> @WA_ITAB-BWKEY
+******                       AND VBRP~VKBUR = @VKBUR
+******                       and BUKRS_ANA =   @WA_ITAB-EKORG  .
+******              ENDIF.
+******
+******
+******              LOOP AT SD_TAB ASSIGNING FIELD-SYMBOL(<SD_WA>).
+******                indx2 = SY-TABIX.
+******                if <SD_WA>-AUTYP = 'H'.
+******                  <SD_WA>-FKLMG = <SD_WA>-FKLMG * -1.
+*******                  <SD_WA>-NETWR = <SD_WA>-NETWR * -1.
+******                ENDIF.
+******                if <SD_WA>-VF_STATUS_ANA = 'C'.
+******                  <SD_WA>-FKLMG = <SD_WA>-FKLMG * -1.
+*******                  <SD_WA>-NETWR = <SD_WA>-NETWR * -1.
+******                ENDIF.
+******
+******                WA_ITAB-QTY_CONSUMPTION = WA_ITAB-QTY_CONSUMPTION + <SD_WA>-FKLMG .
+*******                WA_ITAB-TOT_NETWR = WA_ITAB-TOT_NETWR + <SD_WA>-NETWR .
+******
+******                IF WA_ITAB-PLTYP IS INITIAL.
+******                   WA_ITAB-PLTYP = <SD_WA>-PLTYP.
+******               ENDIF.
+******               IF WA_ITAB-VTWEG IS INITIAL.
+******                  WA_ITAB-VTWEG = <SD_WA>-VTWEG_ana.
+******                ENDIF.
+******
+******                 IF WA_ITAB-VKORG IS INITIAL.
+******                  WA_ITAB-VKORG = <SD_WA>-VKORG_auft.
+******                ENDIF.
+******
+******              endloop.
+******
+******              IF WA_ITAB-PLTYP IS  INITIAL.
+******                  SELECT SINGLE VBRP~PLTYP_AUFT
+******                  FROM VBRP
+******                  INTO @WA_ITAB-PLTYP
+******                 WHERE VBRP~MATNR = @WA_ITAB-MATNR
+******                    AND  VBRP~WERKS = @WA_ITAB-BWKEY.
+*******                AND SPRAS = @SPRAS.
+*******                   AND VKBUR = @WA_ITAB-VKBUR.
+*******                   .
+******               ENDIF.
+******
+*******SELECT SINGLE  ptext FROM t189t INTO <SD_WA>-ptext WHERE t189t~pltyp EQ <SD_WA>-pltyp AND t189t~spras EQ 'A'.
+******              IF WA_ITAB-ptext IS  INITIAL.
+******                SELECT SINGLE PTEXT
+******                  FROM t189t
+******                 WHERE
+******                  "SPRAS = 'EN'
+******                   PLTYP = @WA_ITAB-PLTYP
+******                  INTO @WA_ITAB-PTEXT.
+******              ENDIF.
+******
+******    SELECT SINGLE prodh FROM mvke INTO wa_itab-prodh
+******      WHERE matnr  = wa_itab-matnr AND
+******            vkorg  = wa_itab-vkorg  AND
+******            vtweg  = wa_itab-vtweg.
+******
+******    CONCATENATE wa_itab-prodh+0(7) '' INTO wa_itab-catg1.
+******
+******
+******SELECT SINGLE t179t~vtext FROM t179
+******      INNER JOIN t179t ON t179t~prodh =   t179~prodh
+******      INTO wa_itab-wert2
+******      WHERE t179~prodh = wa_itab-catg1 AND t179~stufe = '5' .
+******
+******
+******
+******            modify ITAB_ALV FROM WA_ITAB INDEX indx  TRANSPORTING QTY_CONSUMPTION TOT_NETWR WERT2 PLTYP ptext.
+******            CLEAR wa_itab-TOT_NETWR.
+******         ENDLOOP.
+******
+******
+******         "delete ITAB_ALV WHERE QTY_CONSUMPTION = 0 or QTY_CONSUMPTION = '' .
+******
+******
+******
+******
+******         if X1000 <> '1000'.
+******         if X1000 > 0 . "and X1000 < 1000.
+******         LOOP AT ITAB_ALV INTO WA_ITAB ." WHERE BWKEY <> '1101' and  BWKEY <> '1201' and BWKEY <> '1301'..
+******            " WA_ITAB-LOSGR = X1000.
+******
+******           indx = SY-TABIX.
+******           if WA_ITAB-LOSGR > 0.
+******
+******             i = 1.
+******             WHILE i <= 40.
+******                   if i < 10 .
+******                     zero00 = '00'.
+******                   ELSE .
+******                     zero00 = '0'.
+******                   ENDIF.
+******
+******                   STR_DYNAMIC = 'WA_ITAB-KST' && zero00 && i.
+******                   ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+******                   <FS_DYNAMIC> =  ( <FS_DYNAMIC> / WA_ITAB-LOSGR ) *  X1000 .
+******                   "<FS_DYNAMIC> =  <FS_DYNAMIC> * X1000. "WA_ITAB-LOSGR .
+******
+******                   UNASSIGN <FS_DYNAMIC>.
+******                   i = i + 1.
+******             ENDWHILE.
+******
+******              WA_ITAB-LOSGR = X1000 .
+******
+******           ELSEIF WA_ITAB-LOSGR = 0.
+******             WRITE 'Error ' && WA_ITAB-MATNR .
+******           ENDIF.
+******
+******           modify ITAB_ALV FROM WA_ITAB INDEX indx  .
+******         ENDLOOP.
+******         ENDIF.
+******         ENDIF.
+******
+*******BREAK malabsi.
+******        IF ( P_PRTYP-LOW = 'S' AND P_PRTYP-HIGH = 'V' ) .
+******
+******            LOOP AT ITAB_ALV INTO WA_ITAB  WHERE BWKEY <> '1101' AND  BWKEY <> '1201'  AND BWKEY <> '1301'.
+******
+******               APPEND WA_ITAB TO ITAB_ALV_RESULT .
+******
+******               indx = SY-TABIX.
+******               if indx MOD 2 EQ 0 AND indx GT 0.
+******                   i = 1.
+******                   WHILE i <= 40.
+******                     if i < 10 .
+******                       zero00 = '00'.
+******                     ELSE .
+******                       zero00 = '0'.
+******                     ENDIF.
+******
+******                     STR_DYNAMIC = 'WA_ITAB-KST' && zero00  && i.
+******                     ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+******
+******                     STR_DYNAMIC1 = 'WA_ITAB_LAST-KST' && zero00  && i.
+******                     ASSIGN (STR_DYNAMIC1) TO <FS_DYNAMIC1>.
+******
+******                     STR_DYNAMIC2 = 'WA_ITAB_DIFF-KST' && zero00  && i.
+******                     ASSIGN (STR_DYNAMIC2) TO <FS_DYNAMIC2>.
+******
+******                     STR_DYNAMIC3 = 'WA_ITAB_PRCENT-KST' && zero00 && i.
+******                     ASSIGN (STR_DYNAMIC3) TO <FS_DYNAMIC3>.
+******
+******                     <FS_DYNAMIC2> = <FS_DYNAMIC1> - <FS_DYNAMIC> .
+******
+******                     IF <FS_DYNAMIC1> > 0. <FS_DYNAMIC3> = ( <FS_DYNAMIC2> / <FS_DYNAMIC1>  ) * 100.  ENDIF.
+******
+******
+******                     UNASSIGN <FS_DYNAMIC>.
+******                     UNASSIGN <FS_DYNAMIC1>.
+******                     UNASSIGN <FS_DYNAMIC2>.
+******                     UNASSIGN <FS_DYNAMIC3>.
+******                     i = i + 1.
+******                   ENDWHILE.
+******
+******
+******                     WA_ITAB_DIFF-QTY_BEGIN_INV = ''.
+******                     WA_ITAB_DIFF-QTY_END_INV = ''.
+******                     WA_ITAB_PRCENT-QTY_BEGIN_INV = ''.
+******                     WA_ITAB_PRCENT-QTY_END_INV = ''.
+******                     WA_ITAB_DIFF-WGBEZ = 'الفارق قيمة'.
+******                     WA_ITAB_PRCENT-WGBEZ = 'الفارق نسبة'.
+******
+******
+******                     APPEND WA_ITAB_DIFF TO ITAB_ALV_RESULT .
+******                     APPEND WA_ITAB_PRCENT TO ITAB_ALV_RESULT .
+******
+******                     CLEAR: WA_ITAB_DIFF ,WA_ITAB_PRCENT , WA_ITAB , WA_ITAB_LAST.
+******
+******               ELSE.
+******                     MOVE-CORRESPONDING WA_ITAB to WA_ITAB_LAST.
+******               ENDIF.
+******
+******            ENDLOOP .
+******
+******            "1101 mahdi
+******            LOOP AT ITAB_ALV INTO WA_ITAB WHERE BWKEY = '1101' OR  BWKEY = '1201' OR BWKEY = '1301'.
+******                APPEND WA_ITAB TO ITAB_ALV_RESULT .
+******            ENDLOOP .
+******            "end 1101 mahdi
+******            CLEAR ITAB_ALV.
+******            MOVE-CORRESPONDING ITAB_ALV_RESULT TO ITAB_ALV .
+******
+******        ENDIF.
+******
+******
+******          IF FUCOST = 'X'.
+******             SELECT  TCKH3~ELEMT , TCKH3~EL_HV , TCKH1~TXELE "INTO ( @ELEMT , @EL_HV , @TXELE )
+******              Into CORRESPONDING FIELDS OF TABLE @it
+******              FROM TCKH3
+******              LEFT OUTER JOIN TCKH1 on ( TCKH1~ELEHK = TCKH3~ELEHK AND  TCKH1~ELEMT = TCKH3~ELEMT AND TCKH1~SPRAS = @SPRAS )
+******              WHERE TCKH3~ELEHK = 'M0'
+******              order by TCKH3~ELEMT .
+******          ELSEIF FIXCOST = 'X'.
+******              SELECT  TCKH3~ELEMT , TCKH3~EL_HF as EL_HV , TCKH1~TXELE "INTO ( @ELEMT , @EL_HV , @TXELE )
+******              Into CORRESPONDING FIELDS OF TABLE @it
+******              FROM TCKH3
+******              LEFT OUTER JOIN TCKH1 on ( TCKH1~ELEHK = TCKH3~ELEHK AND  TCKH1~ELEMT = TCKH3~ELEMT AND TCKH1~SPRAS = @SPRAS )
+******              WHERE TCKH3~ELEHK = 'M0'
+******              order by TCKH3~ELEMT .
+******         ENDif.
+******
+******
+******          LOOP AT ITAB_ALV INTO WA_ITAB .
+******            indx = SY-TABIX.
+******              LOOP AT it  INTO wa.
+******
+******                STR_DYNAMIC = 'WA_ITAB-KST' && wa-EL_HV.
+******                ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+******
+******                WA_ITAB-TOTAL = WA_ITAB-TOTAL + <FS_DYNAMIC> .
+******
+******                UNASSIGN <FS_DYNAMIC>.
+******
+******              ENDLOOP.
+******
+******            modify ITAB_ALV FROM WA_ITAB INDEX indx TRANSPORTING TOTAL  .
+******          ENDLOOP.
+******
+******
+******
+******          LOOP AT ITAB_ALV INTO WA_ITAB .
+******            indx = SY-TABIX.
+******
+******            SELECT SINGLE NTGEW INTO WA_ITAB-WIGHT  FROM mara WHERE MATNR = WA_ITAB-MATNR .
+******
+******            if WA_ITAB-MEINS = 'TO' .
+******              WA_ITAB-QTY_TON =    WA_ITAB-QTY_CONSUMPTION.
+******            ELSEIF WA_ITAB-MEINS = 'M3'.
+******              WA_ITAB-QTY_TON =    WA_ITAB-QTY_CONSUMPTION.
+******            ELSE.
+******                SELECT SINGLE NTGEW  INTO WA_ITAB-WIGHT  FROM mara WHERE MATNR = WA_ITAB-MATNR .
+******                if sy-SUBRC = 0 .
+******                   WA_ITAB-QTY_TON =  ( WA_ITAB-QTY_CONSUMPTION * WA_ITAB-WIGHT ) / 1000 .
+******                ENDIF.
+******            ENDIF.
+******
+******              WA_ITAB-NET_WEIGHT =  WA_ITAB-QTY_CONSUMPTION * WA_ITAB-WIGHT.
+******              WA_ITAB-NET_WEIGHT_TON = WA_ITAB-NET_WEIGHT / 1000.
+******
+******            modify ITAB_ALV FROM WA_ITAB INDEX indx TRANSPORTING QTY_TON WIGHT NET_WEIGHT NET_WEIGHT_TON.
+******          ENDLOOP.
+******
+******
+******
+*******         LOOP AT ITAB_ALV INTO WA_ITAB .
+*******           indx = SY-TABIX.
+*******
+*******           CONCATENATE  WA_ITAB-BDATJ WA_ITAB-POPER+1(2) '01' INTO SDDATS.
+*******
+*******           CALL FUNCTION 'HR_JP_MONTH_BEGIN_END_DATE'
+*******              EXPORTING
+*******                  iv_date = SDDATS
+*******              IMPORTING
+*******                  EV_MONTH_BEGIN_DATE = FDATS
+*******                  EV_MONTH_END_DATE   = TDATS.
+*******
+*******
+*******            CLEAR: WA_ITAB-NET, WA_ITAB-NET2.
+******** vbrp~AUTYP,
+********   vbrp~bukrs_ana     AS bukrs,
+********      vbrp~fktyp_ana     AS fkart,
+********      vbrp~pstyv,
+********      vbrp~fkdat_ana     AS fkdat,
+********      vbrp~vkorg_auft    AS vkorg,
+********      vbrp~netwr AS NET,
+********
+********      vbrp~brgew         AS gross_weight,
+********
+********      vbrp~pltyp_auft    AS pltyp,
+********
+********      vbrp~vtweg_ana     AS vtweg,
+********
+********      vbrp~fklmg         AS meng_b_bu,
+********      vbrp~meins         AS meins_b_bu,
+********                     vbrp~vbeln,
+********                     vbrp~posnr,
+*********                     vbrp~netwr,
+********                     vbrp~vkbur,
+********                     vbrp~werks,
+********                     vbrp~matnr,
+********                     vbrp~arktx,
+*********                     vbrp~brgew        AS GROSS_WEIGHT,
+********                     vbrp~lgort,
+*********                     vbrp~kzwi1,
+********                     vbrp~kursk,
+********                     vbrp~vgbel,
+********                     vbrp~vgpos,
+*********                     vbrp~pltyp_auft   AS PLTYP,
+********                     vbrp~bzirk_auft,
+********                     vbrp~regio_auft,
+*********                     vbrp~vtweg_ana    AS VTWEG,
+********                     vbrp~vkgrp,
+********                     vbrp~knumv_ana,
+*********                     vbrp~meins,
+********                     vbrp~gewei,
+********                     vbrp~spart,
+*********                     vbrp~shkzg,
+*********                      vbrp~AUTYP,
+********                     vbrp~vbtyp_ana,
+********                     vbrp~kunwe_ana,
+********                     vbrp~mvgr3,
+********                     vbrp~vtweg_auft,
+********                     vbrp~vf_status_ana ,
+********                     vbrp~vkorg_auft
+*******
+*******
+*******
+********            SELECT VBRP~FKLMG,
+********                   VBRP~FKIMG,
+********                   VBRP~AUTYP,
+********                   VBRP~BUKRS_ANA,
+********                   VBRP~FKTYP_ANA,
+********                   VBRP~PSTYV,
+********                   VBRP~FKDAT_ANA,
+********                   VBRP~NETWR,
+********                   VBRP~BRGEW,
+********                   VBRP~NTGEW,
+********                   VBRP~PLTYP_AUFT AS PLTYP ,
+********                   VBRP~VTWEG_ANA,
+********                   VBRP~MEINS,
+********                   VBRP~VBELN,
+********                   VBRP~POSNR,
+********                   VBRP~VKBUR,
+********                   VBRP~WERKS,
+********                   VBRP~ARKTX,
+********                   VBRP~LGORT,
+********                   VBRP~KURSK,
+********                   VBRP~VGBEL,
+********                   VBRP~VGPOS,
+********                   VBRP~BZIRK_AUFT,
+********                   VBRP~REGIO_AUFT,
+********                   VBRP~VKGRP,
+********                   VBRP~KNUMV_ANA,
+********                   VBRP~GEWEI,
+********                   VBRP~SPART,
+********                   VBRP~SHKZG,
+********                   VBRP~VBTYP_ANA,
+********                   VBRP~KUNWE_ANA,
+********                   VBRP~MVGR3,
+********                   VBRP~VTWEG_AUFT,
+********                   VBRP~VF_STATUS_ANA,
+********                   VBRP~VKORG_AUFT As vkorg_item
+*********                   VBRP~VKORG_ANA,
+*********                   VBRK~VTWEG,
+*********                   VBRK~SPART,
+*********                   VBRK~KUNRG,
+*********                   VBRK~KUNAG,
+*********                   VBRK~KUNWE,
+**********                   VBRK~STBLG,
+*********                   VBRK~FKART,
+*********                   VBRK~BUKRS
+********              INTO TABLE @SD_TAB
+********              FROM VBRP
+*********              INNER JOIN VBRK ON VBRK~VBELN = VBRP~VBELN
+********             WHERE VBRP~AUTYP IN ( 'V' , 'C' , 'I' , 'H', 'K' )
+********               AND VBRP~FKDAT_ANA BETWEEN @FDATS AND @TDATS
+********               AND VBRP~MATNR =  @WA_ITAB-MATNR
+********               AND VBRP~FKTYP_ANA IN ( 'L' , 'I' )
+********               AND VBRP~WERKS =  @WA_ITAB-BWKEY
+********               AND VBRP~BUKRS_ANA =   @WA_ITAB-EKORG
+*********              AND  VBRP~VKORG_AUFT = @WA_ITAB-VKORG
+********             ORDER BY VBRP~VBELN, VBRP~POSNR
+********              .
+********_____________________________________________________________________LAST EDIT 2
+*******
+*******
+*******
+*******" Get unique KNUMVs as a simple internal table
+*******" Step 2: Create RANGES table from SD_TAB KNUMVs
+********RANGES gr_knumv FOR prcd_elements-knumv.
+********LOOP AT SD_TAB INTO DATA(da).
+********  APPEND VALUE #( sign = 'I' option = 'EQ' low = da-knumv_ana ) TO gr_knumv.
+********ENDLOOP.
+********
+********" Remove duplicates
+********SORT gr_knumv.
+********DELETE ADJACENT DUPLICATES FROM gr_knumv COMPARING low.
+********
+********" Step 3: Pre-aggregate PRCD_ELEMENTS
+********SELECT knumv,
+********       SUM( KWERT * KKURS ) AS total_cost
+********  INTO TABLE @DATA(prcd_map)
+********  FROM prcd_elements
+******** WHERE knumv IN @gr_knumv
+********   AND sakn1 IN ( '4100060000', '4100040000', '6010080000', '6010080001', '6010010000',
+********                  '6010020000', '6010030000', '6010040000', '6010070000', '6010100000',
+********                  '4105040000', '4105060000', '4105090000', '6010120000', '6015010000',
+********                  '6015020000', '6100030000', '4100090000', '6100010000', '6100020000',
+********                  '6100060000', '5720010000' )
+******** GROUP BY knumv.
+*******
+*******
+********               LOOP AT SD_TAB ASSIGNING FIELD-SYMBOL(<SD_WA>).
+********                 indx2 = SY-TABIX.
+**********
+**********       if <SD_WA>-AUTYP = 'H'.
+**********if <SD_WA>-VF_STATUS_ANA = 'C'.
+**********                   <SD_WA>-FKLMG = <SD_WA>-FKLMG * -1.
+**********                    <SD_WA>-NETWR =  <SD_WA>-NETWR * -1.
+**********                  <SD_WA>-NTGEW = <SD_WA>-NTGEW * -1.
+**********                    ENDIF.
+*********
+*********
+***********                 if <SD_WA>-VF_STATUS_ANA = 'C' OR <SD_WA>-AUTYP = 'H' OR <SD_WA>-shkzg = 'X'.
+**********           IF ( <SD_WA>-shkzg = 'X' ) .
+**********                    <SD_WA>-FKLMG = <SD_WA>-FKLMG * -1.
+**********                    <SD_WA>-NETWR =  <SD_WA>-NETWR * -1.
+**********                    <SD_WA>-NTGEW = <SD_WA>-NTGEW * -1.
+*********
+*********
+*********
+*********
+*********" ____________________________CALCULATE SELLING COST HERE
+*********"   READ TABLE prcd_map INTO DATA(prcd_row)
+*********"     WITH KEY knumv = <SD_WA>-knumv_ana.
+*********"  prcd_row-total_cost = prcd_row-total_cost * -1.
+*********"   IF sy-subrc = 0.
+*********"     WA_ITAB-SELLING_COST = WA_ITAB-SELLING_COST + prcd_row-total_cost.
+*********"   ENDIF.
+*********
+*********
+*********
+*********                  ELSE.
+*********
+*********
+*********" ____________________________CALCULATE SELLING COST HERE
+*********" READ TABLE prcd_map INTO prcd_row
+*********"     WITH KEY knumv = <SD_WA>-knumv_ana.
+*********"   IF sy-subrc = 0.
+*********"     WA_ITAB-SELLING_COST = WA_ITAB-SELLING_COST + prcd_row-total_cost.
+*********"   ENDIF.
+********* ENDIF.
+**********                  IF ( <SD_WA>-shkzg = 'X' ).
+**********    WA_ITAB-NET = WA_ITAB-NET * -1.
+**********     WA_ITAB-NET2 = WA_ITAB-NET2 * -1.
+**********WA_ITAB-NET_WEIGHT = WA_ITAB-NET_WEIGHT * -1.
+**********   ENDIF.
+********* " ✅ CALCULATE SELLING COST HERE
+********* " ✅ Use READ TABLE (most reliable)
+**********  READ TABLE gl_accounts TRANSPORTING NO FIELDS WITH KEY table_line = <SD_WA>-SAKN1.
+**********  IF ( sy-subrc = 0 AND <SD_WA>-WAERS = 'YER' ).
+**********    WA_ITAB-SELLING_COST = WA_ITAB-SELLING_COST + <SD_WA>-KBETR.
+**********  ENDIF.
+********** SELECT SUM( PRCD~KWERT * PRCD~KKURS ) INTO @DATA(seling_cost)
+**********    FROM prcd_elements AS PRCD
+**********   WHERE knumv = @<SD_WA>-knumv_ana
+**********     AND sakn1 IN ( '4100060000', '4100040000', '6010080000', '6010080001', '6010010000',
+**********                    '6010020000', '6010030000', '6010040000', '6010070000', '6010100000',
+**********                    '4105040000', '4105060000', '4105090000', '6010120000', '6015010000',
+**********                    '6015020000', '6100030000', '4100090000', '6100010000', '6100020000',
+**********                    '6100060000', '5720010000' )
+**********     .
+**********  WA_ITAB-SELLING_COST = WA_ITAB-SELLING_COST + seling_cost.
+**********CLEAR seling_cost.
+*********
+********* " ✅ Lookup selling cost'
+*********
+*********
+********** *  WA_ITAB-SELLING_COST = WA_ITAB-SELLING_COST + seling_cost.
+**********CLEAR seling_cost.
+**********  IF ( line_exists( gl_accounts[ table_line = <SD_WA>-SAKN1 ] )  AND  ( <SD_WA>-WAERS = 'YER' ) ).
+**********    WA_ITAB-SELLING_COST = WA_ITAB-SELLING_COST + <SD_WA>-KBETR.
+**********  ENDIF.
+*********                  WA_ITAB-NET = WA_ITAB-NET  + <SD_WA>-NETWR.
+*********                  WA_ITAB-NET2 = WA_ITAB-NET2 + ( <SD_WA>-NETWR * <SD_WA>-KURSK ).
+**********                WA_ITAB-NET_WEIGHT = WA_ITAB-NET_WEIGHT + <SD_WA>-NTGEW.
+*********                 WA_ITAB-QTY_CONSUMPTION = WA_ITAB-QTY_CONSUMPTION + <SD_WA>-FKLMG .
+********                 WA_ITAB-SELLING_COST = WA_ITAB-SELLING_COST + <SD_WA>-HSL.
+********                  WA_ITAB-HSL = <SD_WA>-HSL.
+*********
+*********
+********* SELECT SUM( ntgew ) FROM vbrp INTO @DATA(net_weight) WHERE vbeln EQ @<SD_WA>-vbeln  AND posnr EQ @<SD_WA>-posnr AND matnr = @<SD_WA>-matnr.
+*********          WA_ITAB-NET_WEIGHT = WA_ITAB-NET_WEIGHT + net_weight.
+********* IF WA_ITAB-PLTYP IS INITIAL.
+*********                   WA_ITAB-PLTYP = <SD_WA>-PLTYP.
+*********               ENDIF.
+*********               IF WA_ITAB-VTWEG IS INITIAL.
+*********                  WA_ITAB-VTWEG = <SD_WA>-VTWEG.
+*********                ENDIF.
+*********
+*********                 IF WA_ITAB-VKORG IS INITIAL.
+*********                  WA_ITAB-VKORG = <SD_WA>-VKORG.
+*********                ENDIF.
+**********                IF WA_ITAB-SELLING_COST IS INITIAL.
+**********                   WA_ITAB-SELLING_COST = <SD_WA>-SELLING_COST.
+**********                ENDIF.
+********
+******** endloop.
+*******
+*******
+***********                IF WA_ITAB-gewei = 'TO' .
+***********                WA_ITAB-NET_WEIGHT_TON =   WA_ITAB-net_weight.
+***********              ELSE.
+***********                WA_ITAB-NET_WEIGHT_TON = WA_ITAB-NET_WEIGHT / 1000.
+***********              ENDIF.
+***********
+***********              IF WA_ITAB-PLTYP IS  INITIAL.
+***********                  SELECT SINGLE VBRP~PLTYP_AUFT
+***********                  FROM VBRP
+***********                  INTO @WA_ITAB-PLTYP
+***********                 WHERE VBRP~MATNR = @WA_ITAB-MATNR
+***********                    AND  VBRP~WERKS = @WA_ITAB-BWKEY.
+************                AND SPRAS = @SPRAS.
+************                   AND VKBUR = @WA_ITAB-VKBUR.
+************                   .
+***********               ENDIF.
+***********
+************SELECT SINGLE  ptext FROM t189t INTO <SD_WA>-ptext WHERE t189t~pltyp EQ <SD_WA>-pltyp AND t189t~spras EQ 'A'.
+***********              IF WA_ITAB-ptext IS  INITIAL.
+***********                SELECT SINGLE PTEXT
+***********                  FROM t189t
+***********                 WHERE
+***********                  "SPRAS = 'EN'
+***********                   PLTYP = @WA_ITAB-PLTYP
+***********                  INTO @WA_ITAB-PTEXT.
+***********              ENDIF.
+***********
+***********    SELECT SINGLE prodh FROM mvke INTO wa_itab-prodh
+***********      WHERE matnr  = wa_itab-matnr AND
+***********            vkorg  = wa_itab-vkorg  AND
+***********            vtweg  = wa_itab-vtweg.
+***********
+***********    CONCATENATE wa_itab-prodh+0(7) '' INTO wa_itab-catg1.
+************    CONCATENATE wa_itab-prodh+0(9) '' INTO wa_itab-catg2.
+************    CONCATENATE wa_itab-prodh+0(15) '' INTO wa_itab-catg4.
+***********
+***********SELECT SINGLE t179t~vtext FROM t179
+***********      INNER JOIN t179t ON t179t~prodh =   t179~prodh
+***********      INTO wa_itab-wert2
+***********      WHERE t179~prodh = wa_itab-catg1 AND t179~stufe = '5' .
+***********
+***********
+************WA_ITAB-SELLING_COST = <SD_TAB>-SELLING_COST.
+***********
+*******
+*******
+*******               modify ITAB_ALV FROM WA_ITAB INDEX indx TRANSPORTING QTY_CONSUMPTION NET NET2 NET_WEIGHT NET_WEIGHT_TON wert2 SELLING_COST HSL .
+*******               CLEAR WA_ITAB.
+*******
+*******
+*******
+*******         ENDLOOP.
+******
+*******                   WA_ITAB-QTY_CONSUMPTION = WA_ITAB-QTY_CONSUMPTION + LV_FKLMG.
+*******                WA_ITAB-MENG_B_BU       = WA_ITAB-MENG_B_BU + LV_FKLMG.
+*******                WA_ITAB-QUANTITY        = WA_ITAB-QUANTITY + LV_FKIMG.
+*******                WA_ITAB-NET             = WA_ITAB-NET + LV_NETWR.
+*******                WA_ITAB-GROSS_WEIGHT    = WA_ITAB-GROSS_WEIGHT + LV_BRGEW.
+*******                WA_ITAB-NET_WEIGHT      = WA_ITAB-NET_WEIGHT + LV_NTGEW.
+*******
+*******                IF <SD_WA>-KURSK IS NOT INITIAL.
+*******                  WA_ITAB-NET2 = WA_ITAB-NET2 + ( LV_NETWR * <SD_WA>-KURSK ).
+*******                  WA_ITAB-KURSK = <SD_WA>-KURSK.
+*******                ELSE.
+*******                  WA_ITAB-NET2 = WA_ITAB-NET2 + LV_NETWR.
+*******                ENDIF.
+*******
+*******                 IF WA_ITAB-gewei = 'TO' .
+*******                WA_ITAB-NET_WEIGHT_TON =   WA_ITAB-net_weight.
+*******              ELSE.
+*******                WA_ITAB-NET_WEIGHT_TON = WA_ITAB-NET_WEIGHT / 1000.
+*******              ENDIF.
+******
+*******____________________________________LAST CHANGE____________________________________________
+*******
+*******            READ TABLE SD_TAB INDEX 1 INTO DATA(LS_SD_FIRST).
+*******              IF SY-SUBRC = 0.
+*******                WA_ITAB-VBELN         = LS_SD_FIRST-VBELN.
+*******                WA_ITAB-POSNR         = LS_SD_FIRST-POSNR.
+*******                WA_ITAB-RLDNR         = LS_SD_FIRST-RLDNR.
+*******                WA_ITAB-RACCT         = LS_SD_FIRST-RACCT.
+*******                WA_ITAB-BUKRS         = LS_SD_FIRST-BUKRS_HDR.
+*******                WA_ITAB-FKART         = LS_SD_FIRST-FKART_HDR.
+*******                WA_ITAB-PSTYV         = LS_SD_FIRST-PSTYV.
+*******                WA_ITAB-FKDAT         = LS_SD_FIRST-FKDAT.
+*******                WA_ITAB-VKORG         = LS_SD_FIRST-VKORG_HDR.
+*******                WA_ITAB-VTWEG         = LS_SD_FIRST-VTWEG_HDR.
+*******                WA_ITAB-SPART         = LS_SD_FIRST-SPART_HDR.
+********                WA_ITAB-VBELN_C       = LS_SD_FIRST-STBLG.
+*******                WA_ITAB-KUNRG         = LS_SD_FIRST-KUNRG.
+*******                WA_ITAB-SOLD_TO_PARTY = LS_SD_FIRST-KUNAG.
+*******                WA_ITAB-SHIP_TO_PARTY = LS_SD_FIRST-KUNWE.
+*******                WA_ITAB-PLTYP         = LS_SD_FIRST-PLTYP.
+*******                WA_ITAB-VKBUR         = LS_SD_FIRST-VKBUR.
+*******                WA_ITAB-WERKS         = LS_SD_FIRST-WERKS.
+*******                WA_ITAB-ARKTX         = LS_SD_FIRST-ARKTX.
+*******                WA_ITAB-LGORT         = LS_SD_FIRST-LGORT.
+*******                WA_ITAB-AUTYP         = LS_SD_FIRST-AUTYP.
+*******                WA_ITAB-VBTYP_ANA     = LS_SD_FIRST-VBTYP.
+*******                WA_ITAB-KUNWE_ANA     = LS_SD_FIRST-KUNWE_ANA.
+*******                WA_ITAB-MVGR3         = LS_SD_FIRST-MVGR3.
+*******                WA_ITAB-VTWEG_AUFT    = LS_SD_FIRST-VTWEG_AUFT.
+*******                WA_ITAB-VF_STATUS_ANA = LS_SD_FIRST-VF_STATUS.
+*******                WA_ITAB-VKORG_AUFT    = LS_SD_FIRST-VKORG_ITEM.
+*******                WA_ITAB-MEINS_B_BU    = LS_SD_FIRST-MEINS.
+*******                WA_ITAB-GEWEI         = LS_SD_FIRST-GEWEI.
+*******                WA_ITAB-REGIO         = LS_SD_FIRST-REGIO.
+*******                WA_ITAB-BZIRK_AUFT    = LS_SD_FIRST-BZIRK.
+*******
+*******              ENDIF.
+*******
+*******              LOOP AT SD_TAB ASSIGNING FIELD-SYMBOL(<SD_WA>).
+*******
+*******
+*******                DATA(LV_SIGN) = 1.
+*******                IF <SD_WA>-AUTYP = 'H'.
+*******                  LV_SIGN = LV_SIGN * -1.
+*******                ENDIF.
+*******                IF <SD_WA>-VF_STATUS = 'C'.
+*******                  LV_SIGN = LV_SIGN * -1.
+*******                ENDIF.
+*******
+********                 SELECT SINGLE vbeln FROM vbfa INTO @DATA(LV_VBLEN_C) WHERE vbelv EQ @<SD_WA>-vbeln AND vbtyp_v EQ 'M' AND vbtyp_n EQ 'N'.
+********               WA_ITAB-VBELN_C =  LV_VBLEN_C.
+*******                DATA(LV_FKLMG) = <SD_WA>-FKLMG * LV_SIGN.
+*******                DATA(LV_FKIMG) = <SD_WA>-FKIMG * LV_SIGN.
+*******                DATA(LV_NETWR) = <SD_WA>-NETWR ."* LV_SIGN.
+*******                DATA(LV_BRGEW) = <SD_WA>-BRGEW * LV_SIGN.
+*******                DATA(LV_NTGEW) = <SD_WA>-NTGEW * LV_SIGN.
+*******
+*******                WA_ITAB-QTY_CONSUMPTION = WA_ITAB-QTY_CONSUMPTION + LV_FKLMG.
+*******                WA_ITAB-MENG_B_BU       = WA_ITAB-MENG_B_BU + LV_FKLMG.
+*******                WA_ITAB-QUANTITY        = WA_ITAB-QUANTITY + LV_FKIMG.
+*******                WA_ITAB-NET             = WA_ITAB-NET + LV_NETWR.
+*******                WA_ITAB-GROSS_WEIGHT    = WA_ITAB-GROSS_WEIGHT + LV_BRGEW.
+*******                WA_ITAB-NET_WEIGHT      = WA_ITAB-NET_WEIGHT + LV_NTGEW.
+*******
+*******                IF <SD_WA>-KURSK IS NOT INITIAL.
+*******                  WA_ITAB-NET2 = WA_ITAB-NET2 + ( LV_NETWR * <SD_WA>-KURSK ).
+*******                  WA_ITAB-KURSK = <SD_WA>-KURSK.
+*******                ELSE.
+*******                  WA_ITAB-NET2 = WA_ITAB-NET2 + LV_NETWR.
+*******                ENDIF.
+*******
+*******                 IF WA_ITAB-gewei = 'TO' .
+*******                WA_ITAB-NET_WEIGHT_TON =   WA_ITAB-net_weight.
+*******              ELSE.
+*******                WA_ITAB-NET_WEIGHT_TON = WA_ITAB-NET_WEIGHT / 1000.
+*******              ENDIF.
+********                    IF <SD_WA>-KURSK IS NOT INITIAL.
+********                  WA_ITAB-NET2 = WA_ITAB-NET2 + ( LV_NETWR * <SD_WA>-KURSK ).
+********                  WA_ITAB-KURSK = <SD_WA>-KURSK.
+********                ELSE.
+********                  WA_ITAB-NET2 = WA_ITAB-NET2 + LV_NETWR.
+********                ENDIF.
+********
+********                  DATA: lv_total TYPE netwr,
+********      lv_export TYPE netwr,
+********      lv_final  TYPE netwr.
+*********
+*********                  ( CASE WHEN ( a~autyp = 'H' OR a~vf_status_ana = 'C' ) THEN -1 ELSE 1 END )
+********* a~netwr
+********* ( CASE WHEN a~kursk = 0 THEN 1 ELSE a~kursk END )
+********
+********
+********                  CLEAR lv_export.
+********                    SELECT SUM(
+********
+********         a~netwr
+********         * ( CASE WHEN a~kursk = 0 THEN 1 ELSE a~kursk END ) )
+********                      INTO @lv_export
+********                      FROM vbrp AS a
+********                      INNER JOIN vbrk AS b ON a~vbeln = b~vbeln
+*********                     WHERE b~vtweg IN ('20','30')
+********                       AND a~fktyp_ana IN ('L', 'I')
+********                       AND a~autyp IN ('V', 'C', 'I', 'H', 'K')
+********                       AND a~fkdat_ana BETWEEN @fdats AND @tdats
+********                       AND a~matnr = @wa_itab-matnr
+********                       AND a~werks = @wa_itab-bwkey
+*********                       AND  a~VKORG_AUFT = '20'
+********                       AND a~bukrs_ana = @wa_itab-ekorg.
+********
+********                    IF sy-subrc = 0
+********                      AND lv_export IS NOT INITIAL.
+********                      WA_ITAB-NET2 = WA_ITAB-NET2 + lv_export.
+*********                      CLEAR lv_export_sum.
+********                    ENDIF.
+*******
+*******
+*******
+*******
+*******                IF WA_ITAB-MEINS_B_BU IS INITIAL.
+*******                  WA_ITAB-MEINS_B_BU = <SD_WA>-MEINS.
+*******                ENDIF.
+*******                IF WA_ITAB-GEWEI IS INITIAL.
+*******                  WA_ITAB-GEWEI = <SD_WA>-GEWEI.
+*******                ENDIF.
+*******                IF WA_ITAB-REGIO IS INITIAL.
+*******                  WA_ITAB-REGIO = <SD_WA>-REGIO.
+*******                ENDIF.
+*******                IF WA_ITAB-BZIRK_AUFT IS INITIAL.
+*******                  WA_ITAB-BZIRK_AUFT = <SD_WA>-BZIRK.
+*******                ENDIF.
+*******              ENDLOOP.
+*******
+*******              WA_ITAB-MENG_B_BU_TOT = WA_ITAB-MENG_B_BU.
+*******
+*******
+*******
+*******
+*******              IF WA_ITAB-FKDAT IS NOT INITIAL.
+*******                WA_ITAB-MONTH = |{ WA_ITAB-FKDAT+4(2) }.{ WA_ITAB-FKDAT(4) }|.
+*******              ENDIF.
+*******
+*******              IF WA_ITAB-VTWEG IS NOT INITIAL.
+*******                SELECT SINGLE VTEXT
+*******                  FROM TVTWT
+*******                  INTO @WA_ITAB-VTEXT
+*******                 WHERE SPRAS = @SPRAS
+*******                   AND VTWEG = @WA_ITAB-VTWEG.
+*******              ENDIF.
+*******
+*******              IF WA_ITAB-SPART IS NOT INITIAL.
+*******                SELECT SINGLE VTEXT
+*******                  FROM TSPAT
+*******                  INTO @WA_ITAB-SPART_N
+*******                 WHERE SPRAS = @SPRAS
+*******                   AND SPART = @WA_ITAB-SPART.
+*******              ENDIF.
+*******
+*******              IF WA_ITAB-KUNRG IS NOT INITIAL.
+*******                SELECT SINGLE NAME1
+*******                  FROM KNA1
+*******                  INTO @WA_ITAB-KUNRG_N
+*******                 WHERE KUNNR = @WA_ITAB-KUNRG.
+*******              ENDIF.
+*******
+*******              IF WA_ITAB-SOLD_TO_PARTY IS NOT INITIAL.
+*******                SELECT SINGLE NAME1
+*******                  FROM KNA1
+*******                  INTO @WA_ITAB-SOLD_N
+*******                 WHERE KUNNR = @WA_ITAB-SOLD_TO_PARTY.
+*******              ENDIF.
+*******
+*******              IF WA_ITAB-SHIP_TO_PARTY IS NOT INITIAL.
+*******                SELECT SINGLE NAME1
+*******                  FROM KNA1
+*******                  INTO @WA_ITAB-SHIP_N
+*******                 WHERE KUNNR = @WA_ITAB-SHIP_TO_PARTY.
+*******              ENDIF.
+*******
+*******              IF WA_ITAB-VKORG IS NOT INITIAL.
+*******                SELECT SINGLE VTEXT
+*******                  FROM TVKOT
+*******                  INTO @WA_ITAB-VKORG_DESC
+*******                 WHERE SPRAS = @SPRAS
+*******                   AND VKORG = @WA_ITAB-VKORG.
+*******              ENDIF.
+*******
+*******              IF WA_ITAB-FKART IS NOT INITIAL.
+*******                SELECT SINGLE VTEXT
+*******                  FROM TVFKT
+*******                  INTO @WA_ITAB-FKART_DESC
+*******                 WHERE SPRAS = @SPRAS
+*******                   AND FKART = @WA_ITAB-FKART.
+*******              ENDIF.
+********              IF WA_ITAB-PLTYP IS NOT INITIAL.
+********                  SELECT SINGLE VBRP~PLTYP_AUFT
+********                  FROM VBRP
+********                  INTO WA_ITAB-PLTYP
+********                 WHERE VBRP~MATRN = WA_ITAB-MATRN
+********                    AND  VBRP~WERKS = WA_ITAB-BWKEY.
+********                AND SPRAS = @SPRAS.
+********                   AND VKBUR = @WA_ITAB-VKBUR.
+********                   .
+********               ENDIF.
+********               IF WA_ITAB-PLTYP IS NOT INITIAL.
+********                   WA_ITAB-PLTYP = WA_ITAB-PLTYP.
+********               ENDIF.
+*******
+********              IF WA_ITAB-VKBUR IS NOT INITIAL.
+********                SELECT SINGLE BEZEI
+********                  FROM TVKBZT
+********                  INTO @WA_ITAB-VKBUR_DESC
+********                 WHERE SPRAS = @SPRAS
+********                   AND VKBUR = @WA_ITAB-VKBUR.
+********              ENDIF.
+********SELECT SINGLE  ptext FROM t189t INTO <SD_WA1>-ptext WHERE t189t~pltyp EQ <SD_WA1>-pltyp AND t189t~spras EQ 'A'.
+*******              IF WA_ITAB-ptext IS NOT INITIAL.
+*******                SELECT SINGLE PTEXT
+*******                  FROM t189t
+*******                 WHERE SPRAS = 'A'
+*******                   AND PLTYP = @WA_ITAB-PLTYP
+*******                  INTO @WA_ITAB-PTEXT.
+*******              ENDIF.
+*******
+*******    SELECT SINGLE prodh FROM mvke INTO wa_itab-prodh
+*******      WHERE matnr  = wa_itab-matnr AND
+*******            vkorg  = wa_itab-vkorg  AND
+*******            vtweg  = wa_itab-vtweg.
+*******
+*******    CONCATENATE wa_itab-prodh+0(7) '' INTO wa_itab-catg1.
+********    CONCATENATE wa_itab-prodh+0(9) '' INTO wa_itab-catg2.
+********    CONCATENATE wa_itab-prodh+0(15) '' INTO wa_itab-catg4.
+*******
+*******SELECT SINGLE t179t~vtext FROM t179
+*******      INNER JOIN t179t ON t179t~prodh =   t179~prodh
+*******      INTO wa_itab-wert2
+*******      WHERE t179~prodh = wa_itab-catg1 AND t179~stufe = '5' AND spras = 'AR'.
+*******
+*******
+*******
+*******
+*******            modify ITAB_ALV FROM WA_ITAB INDEX indx.
+*******         ENDLOOP.
+*******____________________________________LAST CHANGE____________________________________________
+******
+******         "delete ITAB_ALV WHERE QTY_CONSUMPTION = 0 or QTY_CONSUMPTION = '' .
+******
+******
+******
+******
+*******         if X1000 <> '1000'.
+*******         if X1000 > 0 . "and X1000 < 1000.
+*******         LOOP AT ITAB_ALV INTO WA_ITAB ." WHERE BWKEY <> '1101' and  BWKEY <> '1201' and BWKEY <> '1301'..
+*******            " WA_ITAB-LOSGR = X1000.
+*******
+*******           indx = SY-TABIX.
+*******           if WA_ITAB-LOSGR > 0.
+*******
+*******             i = 1.
+*******             WHILE i <= 40.
+*******                   if i < 10 .
+*******                     zero00 = '00'.
+*******                   ELSE .
+*******                     zero00 = '0'.
+*******                   ENDIF.
+*******
+*******                   STR_DYNAMIC = 'WA_ITAB-KST' && zero00 && i.
+*******                   ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+*******                   <FS_DYNAMIC> =  ( <FS_DYNAMIC> / WA_ITAB-LOSGR ) *  X1000 .
+*******                   "<FS_DYNAMIC> =  <FS_DYNAMIC> * X1000. "WA_ITAB-LOSGR .
+*******
+*******                   UNASSIGN <FS_DYNAMIC>.
+*******                   i = i + 1.
+*******             ENDWHILE.
+*******
+*******              WA_ITAB-LOSGR = X1000 .
+*******
+*******           ELSEIF WA_ITAB-LOSGR = 0.
+*******             WRITE 'Error ' && WA_ITAB-MATNR .
+*******           ENDIF.
+*******
+*******           modify ITAB_ALV FROM WA_ITAB INDEX indx  .
+*******         ENDLOOP.
+*******         ENDIF.
+*******         ENDIF.
+******
+*******BREAK malabsi.
+*******        IF ( P_PRTYP-LOW = 'S' AND P_PRTYP-HIGH = 'V' ) .
+*******
+*******            LOOP AT ITAB_ALV INTO WA_ITAB  WHERE BWKEY <> '1101' AND  BWKEY <> '1201'  AND BWKEY <> '1301'.
+*******
+*******               APPEND WA_ITAB TO ITAB_ALV_RESULT .
+*******
+*******               indx = SY-TABIX.
+*******               if indx MOD 2 EQ 0 AND indx GT 0.
+*******                   i = 1.
+*******                   WHILE i <= 40.
+*******                     if i < 10 .
+*******                       zero00 = '00'.
+*******                     ELSE .
+*******                       zero00 = '0'.
+*******                     ENDIF.
+*******
+*******                     STR_DYNAMIC = 'WA_ITAB-KST' && zero00  && i.
+*******                     ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+*******
+*******                     STR_DYNAMIC1 = 'WA_ITAB_LAST-KST' && zero00  && i.
+*******                     ASSIGN (STR_DYNAMIC1) TO <FS_DYNAMIC1>.
+*******
+*******                     STR_DYNAMIC2 = 'WA_ITAB_DIFF-KST' && zero00  && i.
+*******                     ASSIGN (STR_DYNAMIC2) TO <FS_DYNAMIC2>.
+*******
+*******                     STR_DYNAMIC3 = 'WA_ITAB_PRCENT-KST' && zero00 && i.
+*******                     ASSIGN (STR_DYNAMIC3) TO <FS_DYNAMIC3>.
+*******
+*******                     <FS_DYNAMIC2> = <FS_DYNAMIC1> - <FS_DYNAMIC> .
+*******
+*******                     IF <FS_DYNAMIC1> > 0. <FS_DYNAMIC3> = ( <FS_DYNAMIC2> / <FS_DYNAMIC1>  ) * 100.  ENDIF.
+*******
+*******
+*******                     UNASSIGN <FS_DYNAMIC>.
+*******                     UNASSIGN <FS_DYNAMIC1>.
+*******                     UNASSIGN <FS_DYNAMIC2>.
+*******                     UNASSIGN <FS_DYNAMIC3>.
+*******                     i = i + 1.
+*******                   ENDWHILE.
+*******
+*******
+*******                     WA_ITAB_DIFF-QTY_BEGIN_INV = ''.
+*******                     WA_ITAB_DIFF-QTY_END_INV = ''.
+*******                     WA_ITAB_PRCENT-QTY_BEGIN_INV = ''.
+*******                     WA_ITAB_PRCENT-QTY_END_INV = ''.
+*******                     WA_ITAB_DIFF-WGBEZ = 'الفارق قيمة'.
+*******                     WA_ITAB_PRCENT-WGBEZ = 'الفارق نسبة'.
+*******
+*******
+*******                     APPEND WA_ITAB_DIFF TO ITAB_ALV_RESULT .
+*******                     APPEND WA_ITAB_PRCENT TO ITAB_ALV_RESULT .
+*******
+*******                     CLEAR: WA_ITAB_DIFF ,WA_ITAB_PRCENT , WA_ITAB , WA_ITAB_LAST.
+*******
+*******               ELSE.
+*******                     MOVE-CORRESPONDING WA_ITAB to WA_ITAB_LAST.
+*******               ENDIF.
+*******
+*******            ENDLOOP .
+*******
+*******            "1101 mahdi
+*******            LOOP AT ITAB_ALV INTO WA_ITAB WHERE BWKEY = '1101' OR  BWKEY = '1201' OR BWKEY = '1301'.
+*******                APPEND WA_ITAB TO ITAB_ALV_RESULT .
+*******            ENDLOOP .
+*******            "end 1101 mahdi
+*******            CLEAR ITAB_ALV.
+*******            MOVE-CORRESPONDING ITAB_ALV_RESULT TO ITAB_ALV .
+*******
+*******        ENDIF.
+*******
+*******
+*******          IF FUCOST = 'X'.
+*******             SELECT  TCKH3~ELEMT , TCKH3~EL_HV , TCKH1~TXELE "INTO ( @ELEMT , @EL_HV , @TXELE )
+*******              Into CORRESPONDING FIELDS OF TABLE @it
+*******              FROM TCKH3
+*******              LEFT OUTER JOIN TCKH1 on ( TCKH1~ELEHK = TCKH3~ELEHK AND  TCKH1~ELEMT = TCKH3~ELEMT AND TCKH1~SPRAS = @SPRAS )
+*******              WHERE TCKH3~ELEHK = 'M0'
+*******              order by TCKH3~ELEMT .
+*******          ELSEIF FIXCOST = 'X'.
+*******              SELECT  TCKH3~ELEMT , TCKH3~EL_HF as EL_HV , TCKH1~TXELE "INTO ( @ELEMT , @EL_HV , @TXELE )
+*******              Into CORRESPONDING FIELDS OF TABLE @it
+*******              FROM TCKH3
+*******              LEFT OUTER JOIN TCKH1 on ( TCKH1~ELEHK = TCKH3~ELEHK AND  TCKH1~ELEMT = TCKH3~ELEMT AND TCKH1~SPRAS = @SPRAS )
+*******              WHERE TCKH3~ELEHK = 'M0'
+*******              order by TCKH3~ELEMT .
+*******         ENDif.
+*******
+*******
+*******          LOOP AT ITAB_ALV INTO WA_ITAB .
+*******            indx = SY-TABIX.
+*******              LOOP AT it  INTO wa.
+*******
+*******                STR_DYNAMIC = 'WA_ITAB-KST' && wa-EL_HV.
+*******                ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+*******
+*******                WA_ITAB-TOTAL = WA_ITAB-TOTAL + <FS_DYNAMIC> .
+*******
+*******                UNASSIGN <FS_DYNAMIC>.
+*******
+*******              ENDLOOP.
+*******
+*******            modify ITAB_ALV FROM WA_ITAB INDEX indx TRANSPORTING TOTAL  .
+*******          ENDLOOP.
+*******
+*******
+*******
+*******          LOOP AT ITAB_ALV INTO WA_ITAB .
+*******            indx = SY-TABIX.
+*******
+*******            SELECT SINGLE NTGEW INTO WA_ITAB-WIGHT  FROM mara WHERE MATNR = WA_ITAB-MATNR .
+*******
+*******            if WA_ITAB-MEINS = 'TO' .
+*******              WA_ITAB-QTY_TON =    WA_ITAB-QTY_CONSUMPTION.
+*******            ELSEIF WA_ITAB-MEINS = 'M3'.
+*******              WA_ITAB-QTY_TON =    WA_ITAB-QTY_CONSUMPTION.
+*******            ELSE.
+*******                SELECT SINGLE NTGEW  INTO WA_ITAB-WIGHT  FROM mara WHERE MATNR = WA_ITAB-MATNR .
+*******                if sy-SUBRC = 0 .
+*******                   WA_ITAB-QTY_TON =  ( WA_ITAB-QTY_CONSUMPTION * WA_ITAB-WIGHT ) / 1000 .
+*******                ENDIF.
+*******            ENDIF.
+*******
+*******            modify ITAB_ALV FROM WA_ITAB INDEX indx TRANSPORTING QTY_TON WIGHT .
+*******          ENDLOOP.
+******
+******
+******
+******
+******
+******
+******ENDFORM.
+*******&---------------------------------------------------------------------*
+******
+*******&-------------------------------------------------------------------*
+*******&      Form  alv_show
+*******&-------------------------------------------------------------------*
+*******       text
+*******--------------------------------------------------------------------*
+******FORM alv_show.
+******gs_layout-INFO_FIELDNAME = 'ROWCOLOR'.
+******  CALL FUNCTION 'REUSE_ALV_GRID_DISPLAY'
+******  EXPORTING
+******    I_CALLBACK_TOP_OF_PAGE  = 'TOP-OF-PAGE'
+******    i_callback_program             = prog
+******    i_callback_pf_status_set       = 'SET_PF_STATUS'
+******    i_callback_user_command         = 'USER_COMMAND'
+******    is_layout                      = GS_LAYOUT
+******    it_fieldcat                    = GT_FLDCAT
+******    I_SAVE                         = 'A' "'U' "
+******  TABLES
+******    t_outtab                       = ITAB_ALV[]
+******  EXCEPTIONS
+******    program_error                  = 1
+******    OTHERS                         = 2
+******    .
+******  IF sy-subrc <> 0.
+******  ENDIF.
+******ENDFORM.                    "ALV_SHOW
+*******&---------------------------------------------------------------------*
+*******&---------------------------------------------------------------------*
+*******&---------------------------------------------------------------------*
+*******&      Form  set_pf_status
+*******&---------------------------------------------------------------------*
+*******       text
+*******----------------------------------------------------------------------*
+*******      -->RT_EXTAB   text
+*******----------------------------------------------------------------------*
+******FORM set_pf_status USING rt_extab TYPE slis_t_extab.
+******  SET PF-STATUS 'ZGUI_STATUS'.
+******ENDFORM.                    "set_pf_status
+******
+******
+******
+*******&---------------------------------------------------------------------*
+*******&      Form  BUIILD_FIELDCATALOG
+*******&---------------------------------------------------------------------*
+*******       text
+*******----------------------------------------------------------------------*
+******form build_layout.
+******
+******gd_layout-no_input = 'X'.
+******
+******gd_layout-colwidth_optimize = 'X'.
+******
+******gd_layout-totals_text = 'Totals'(201).
+******
+******gd_layout-totals_only = 'X'.
+******
+******gd_layout-f2code = 'DISP'. "Sets fcode for when double
+******
+******"click(press f2)
+******
+******gd_layout-zebra = 'X'.
+******
+******gd_layout-group_change_edit = 'X'.
+******
+******gd_layout-header_text = 'Mahdi'.
+******gd_LAYOUT-coltab_fieldname = 'CELLCOLOR'.  "CTAB_FNAME
+******endform. " BUILD_LAYOUT
+******
+*******&-------------------------------------------------------------------
+******
+*******&---------------------------------------------------------------------*
+*******&      Form  set_slis_layout
+*******&---------------------------------------------------------------------*
+*******       text
+*******----------------------------------------------------------------------*
+******FORM set_slis_layout CHANGING cs_layout TYPE slis_layout_alv.
+******
+******  cs_layout-colwidth_optimize      = gc_true.
+******  cs_layout-group_change_edit      = gc_true.
+******
+*******  cs_layout-info_fieldname =      'LINE_COLOR'.
+******
+******ENDFORM.                    " set_slis_layout
+******
+******
+******
+******
+*******&-------------------------------------------------------------------
+******
+*******------------------------------------------------------------------*
+*******       FORM USER_COMMAND                                          *
+*******------------------------------------------------------------------*
+*******       --> R_UCOMM                                                *
+*******       --> RS_SELFIELD                                            *
+*******------------------------------------------------------------------*
+******FORM user_command USING r_ucomm LIKE sy-ucomm
+******                  rs_selfield TYPE slis_selfield.
+******
+******  DATA: it_selected TYPE lvc_t_row,
+******        wa_selected TYPE lvc_s_row.
+******
+******    "ref alv
+******DATA ref1 TYPE REF TO cl_gui_alv_grid.
+******CALL FUNCTION 'GET_GLOBALS_FROM_SLVC_FULLSCR'
+******IMPORTING
+******e_grid = ref1.
+******CALL METHOD ref1->check_changed_data.
+******
+*******
+*******  DATA: gd_repid LIKE sy-repid,
+*******  ref_grid TYPE REF TO cl_gui_alv_grid.
+*******  IF ref_grid IS INITIAL.
+*******    CALL FUNCTION 'GET_GLOBALS_FROM_SLVC_FULLSCR'
+*******      IMPORTING
+*******        e_grid = ref_grid.
+*******  ENDIF.
+*******  IF NOT ref_grid IS INITIAL.
+*******    CALL METHOD ref_grid->check_changed_data .
+*******  ENDIF.
+******** Check function code
+******    wa_selected-index = rs_selfield-tabindex.
+******    APPEND wa_selected TO it_selected.
+******    EXPORT it_selected TO MEMORY ID 'Mytabindex'.
+******
+******
+******  CASE r_ucomm.
+******
+******
+******    WHEN '&ONE' .
+******
+******      IF AUTHORITY = 'X'.
+******         CLEAR: ITAB_ALV,ITAB_ALV_RESULT ,WA_ITAB,WA_ITAB_DIFF,WA_ITAB_LAST,WA_ITAB_PRCENT ,it ,wa.
+******         PERFORM load_data.
+******      ENDIF.
+******
+******    WHEN '&1000' or '&QTYC'.
+******
+******      X1000 = '1'.
+******
+******      if r_ucomm = '&ONE' .
+******        X1000 = '1'.
+******      ELSEif r_ucomm = '&1000' .
+******        X1000 = '1000'.
+******      ENDIF.
+******
+******
+******      if X1000 > 0 . "and X1000 < 1000.
+******         LOOP AT ITAB_ALV INTO WA_ITAB ."WHERE BWKEY <> '1101' and  BWKEY <> '1201' and BWKEY <> '1301'.
+******           indx = SY-TABIX.
+******            " WA_ITAB-LOSGR = X1000.
+******
+******           if r_ucomm = '&QTYC' .
+******             if WA_ITAB-QTY_CONSUMPTION <> '' .
+******               X1000 = abs( WA_ITAB-QTY_CONSUMPTION ) .
+******             ELSE.
+******               X1000 = WA_ITAB-LOSGR  .
+******             endif.
+******           ENDIF.
+******
+******
+******           if WA_ITAB-LOSGR > 0.
+******
+******             i = 1.
+******             WHILE i <= 40.
+******                   if i < 10 .
+******                     zero00 = '00'.
+******                   ELSE .
+******                     zero00 = '0'.
+******                   ENDIF.
+******
+******                   STR_DYNAMIC = 'WA_ITAB-KST' && zero00 && i.
+******                   ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+******                   <FS_DYNAMIC> =  ( <FS_DYNAMIC> / WA_ITAB-LOSGR ) *  X1000 .
+******                   "<FS_DYNAMIC> =  <FS_DYNAMIC> * X1000 .
+******
+******                   UNASSIGN <FS_DYNAMIC>.
+******                   i = i + 1.
+******             ENDWHILE.
+******
+******              WA_ITAB-LOSGR = X1000 .
+******           ELSEIF WA_ITAB-LOSGR = 0.
+******             WRITE 'Error ' && WA_ITAB-MATNR .
+******
+******           ENDIF.
+******
+******           modify ITAB_ALV FROM WA_ITAB INDEX indx  .
+******         ENDLOOP.
+******
+******
+******        " if r_ucomm = '&QTYC' .
+******           delete ITAB_ALV WHERE QTY_CONSUMPTION = 0 or QTY_CONSUMPTION = '' .
+******        " ENDIF.
+******
+******
+******          IF ( P_PRTYP-LOW = 'S' AND P_PRTYP-HIGH = 'V' ) .
+******
+******            CLEAR ITAB_ALV_RESULT.
+******            DELETE  ITAB_ALV WHERE WGBEZ = 'الفارق قيمة'.
+******            DELETE  ITAB_ALV WHERE WGBEZ = 'الفارق نسبة'.
+******
+******            LOOP AT ITAB_ALV INTO WA_ITAB WHERE BWKEY <> '1101' and  BWKEY <> '1201' and BWKEY <> '1301'.
+******
+******               APPEND WA_ITAB TO ITAB_ALV_RESULT .
+******
+******               indx = SY-TABIX.
+******               if indx MOD 2 EQ 0 AND indx GT 0.
+******                   i = 1.
+******                   WHILE i <= 40.
+******                     if i < 10 .
+******                       zero00 = '00'.
+******                     ELSE .
+******                       zero00 = '0'.
+******                     ENDIF.
+******
+******                     STR_DYNAMIC = 'WA_ITAB-KST' && zero00  && i.
+******                     ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+******
+******                     STR_DYNAMIC1 = 'WA_ITAB_LAST-KST' && zero00  && i.
+******                     ASSIGN (STR_DYNAMIC1) TO <FS_DYNAMIC1>.
+******
+******                     STR_DYNAMIC2 = 'WA_ITAB_DIFF-KST' && zero00  && i.
+******                     ASSIGN (STR_DYNAMIC2) TO <FS_DYNAMIC2>.
+******
+******                     STR_DYNAMIC3 = 'WA_ITAB_PRCENT-KST' && zero00 && i.
+******                     ASSIGN (STR_DYNAMIC3) TO <FS_DYNAMIC3>.
+******
+******                     <FS_DYNAMIC2> = <FS_DYNAMIC1> - <FS_DYNAMIC> .
+******
+******                     IF <FS_DYNAMIC1> > 0. <FS_DYNAMIC3> = ( <FS_DYNAMIC2> / <FS_DYNAMIC1>  ) * 100.  ENDIF.
+******
+******
+******                     UNASSIGN <FS_DYNAMIC>.
+******                     UNASSIGN <FS_DYNAMIC1>.
+******                     UNASSIGN <FS_DYNAMIC2>.
+******                     UNASSIGN <FS_DYNAMIC3>.
+******                     i = i + 1.
+******                   ENDWHILE.
+******
+******
+******                     WA_ITAB_DIFF-QTY_BEGIN_INV = ''.
+******                     WA_ITAB_DIFF-QTY_END_INV = ''.
+******                     WA_ITAB_PRCENT-QTY_BEGIN_INV = ''.
+******                     WA_ITAB_PRCENT-QTY_END_INV = ''.
+******                     WA_ITAB_DIFF-WGBEZ = 'الفارق قيمة'.
+******                     WA_ITAB_PRCENT-WGBEZ = 'الفارق نسبة'.
+******
+******
+******                     APPEND WA_ITAB_DIFF TO ITAB_ALV_RESULT .
+******                     APPEND WA_ITAB_PRCENT TO ITAB_ALV_RESULT .
+******
+******                     CLEAR: WA_ITAB_DIFF ,WA_ITAB_PRCENT , WA_ITAB , WA_ITAB_LAST.
+******
+******               ELSE.
+******                     MOVE-CORRESPONDING WA_ITAB to WA_ITAB_LAST.
+******               ENDIF.
+******
+******            ENDLOOP .
+******
+******            "1101 mahdi
+******            LOOP AT ITAB_ALV INTO WA_ITAB WHERE BWKEY = '1101' or  BWKEY = '1201' or BWKEY = '1301'.
+******                APPEND WA_ITAB TO ITAB_ALV_RESULT .
+******            ENDLOOP .
+******            "end 1101 mahdi
+******            CLEAR ITAB_ALV.
+******            MOVE-CORRESPONDING ITAB_ALV_RESULT TO ITAB_ALV .
+******
+******        ENDIF.
+******
+******
+******        LOOP AT ITAB_ALV INTO WA_ITAB .
+******            indx = SY-TABIX.
+******              WA_ITAB-TOTAL = 0.
+******              LOOP AT it  INTO wa.
+******
+******                STR_DYNAMIC = 'WA_ITAB-KST' && wa-EL_HV.
+******                ASSIGN (STR_DYNAMIC) TO <FS_DYNAMIC>.
+******
+******                WA_ITAB-TOTAL = WA_ITAB-TOTAL + <FS_DYNAMIC> .
+******
+******                UNASSIGN <FS_DYNAMIC>.
+******
+******              ENDLOOP.
+******
+******            modify ITAB_ALV FROM WA_ITAB INDEX indx TRANSPORTING TOTAL  .
+******          ENDLOOP.
+******
+******
+******
+******         ENDIF.
+******
+******
+******
+******    WHEN 'NTE'.
+******
+******     PERFORM LOAD_DATA.
+******     PERFORM ALV_SHOW.
+******
+******    WHEN 'F03'.
+*******     LEAVE TO SCREEN 0.
+******      LEAVE TO SCREEN 0.
+******
+******          WHEN 'F12'.
+*******     LEAVE TO SCREEN 0.
+******      LEAVE TO SCREEN 0.
+******
+******          WHEN 'F15'.
+*******     LEAVE TO SCREEN 0.
+******      LEAVE TO SCREEN 0.
+******    WHEN 'SAL'.
+******
+******      PERFORM alv_show.
+******    WHEN 'DAL'.
+******
+******      PERFORM alv_show.
+******     WHEN 'CREATE'.
+******       CLEAR WA_ITAB.
+******
+******  ENDCASE.
+******
+******
+******
+******
+******
+******  CALL METHOD ref1->refresh_table_display.
+******   IMPORT it_selected from MEMORY ID 'Mytabindex'.
+******
+******  CALL METHOD ref1->set_selected_rows
+******   EXPORTING
+******      it_index_rows = it_selected .
+******
+******ENDFORM.                    "user_command
+******
+******
+*******
+******FORM BUIILD_FIELDCATALOG .
+******
+******  PERFORM :     " FILL_FLDCAT USING 1  'BUKRS' 'الشركة' ''  '' 'C' 'X'  '20' '' '',
+******
+******
+******                 FILL_FLDCAT USING 1  'FISCYEARPER' 'Month' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 1  'EKORG' 'Company' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 2  'NAME2' 'Ciompany Name' ''  '' 'C' 'X'  '20' '' '',
+******                 fill_fldcat USING  2 'wert2'              'PRODUCT HIR5'                     ''  '' 'C' 'X'  ''  '' '',
+******                 FILL_FLDCAT USING 3  'BWKEY' 'المصنع' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 3  'RACCT' 'الGL' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 3  'RLDNR' 'الGL2' ''  '' 'C' 'X'  '8' '' '',
+******
+*******                 FILL_FLDCAT USING 4  'NAME1' 'Plant Name' ''  '' 'C' 'X'  '20' '' '',
+******
+******                 FILL_FLDCAT USING 5  'PRTYP' 'نوع السعر' ''  '' 'C' 'X'  '8' '' '',
+******
+*******                 FILL_FLDCAT USING 6  'MATKL' 'الجروب' ''  '' 'C' 'X'  '8' '' '',
+*******                 FILL_FLDCAT USING 7  'WGBEZ' 'اسم الجروب' ''  '' 'C' 'X'  '20' '' '',
+*******                 FILL_FLDCAT USING 8  'MATNR' 'المنتج' ''  '' 'C' 'X'  '20' '' '',
+******                 FILL_FLDCAT USING 9  'MAKTG' 'اسم المنتج' ''  '' 'C' 'X'  '20' '' '',
+******                 FILL_FLDCAT USING 10  'MEINS' 'الوحدة' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 11  'MTART' 'نوع المنتج' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 12  'BWTAR' 'نوع التقييم' ''  '' 'C' 'X'  '8' '' '',
+*******                 FILL_FLDCAT USING 13  'LOSGR' 'Costing Lot size' ''  '' 'C' 'X'  '10' '' '',
+******                 FILL_FLDCAT USING 13  'LOSGR2' 'Costing Lot size' ''  '' 'C' 'X'  '10' '' '',
+******
+******
+******                 FILL_FLDCAT USING 14  'BDATJ' 'السنة' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 15  'POPER' 'الشهر' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 16  'CURTP' 'نوع العملة' ''  '' 'C' 'X'  '8' '' '',
+******
+******                 FILL_FLDCAT USING 17  'WAERS' 'العملة' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 18  'KKZST' 'المستوى' ''  '' 'C' 'X'  '8' '' '',
+******                 FILL_FLDCAT USING 19 'KALNR' 'Cost Estimate No' ''  '' 'C' 'X'  '10' '' ''   ,
+*******                 FILL_FLDCAT USING 1  'VBELN'              'Billing Document '                     ''  '' 'C' 'X'  ''  '' '',
+*******                 FILL_FLDCAT USING 1  'VTWEG'              'Distribution Channel'                     ''  '' 'C' 'X'  ''  '' '',
+*******                 FILL_FLDCAT USING 1  'VTEXT'              'Distribution Channel Name'                     ''  '' 'C' 'X'  ''  '' '',
+*******                 FILL_FLDCAT USING 1  'SPART'              'Division'                     ''  '' 'C' 'X'  ''  '' '',
+*******                 FILL_FLDCAT USING 1  'SPART_N'            'Division Name'                     ''  '' 'C' 'X'  ''  '' '',
+*******                 FILL_FLDCAT USING 2  'KUNRG'              'Payer Code'                     ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 3  'KUNRG_N'            'Payer Name'                 ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 4  'SOLD_TO_PARTY'      'Sold To Party Code'             ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 5  'SOLD_N'             'Sold To Party Name'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 6  'QUANTITY'           'Quantity'                   ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 6  'MEINS_B_BU'         'Base Unit of Measure'               ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 6  'MENG_B_BU'          'Bill.Qty in SKU'               ''  '' 'C' 'X'  '20' '' '',
+*******                 FILL_FLDCAT USING 6  'MENG_B_BU_TOT'      'Bill.Qty in SKU TOT'    ''  '' 'C' 'X'  '20' '' '',
+******                 FILL_FLDCAT USING 10 'NET'                'Net Value'         ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 13 'FKDAT'              'Billing Date'                ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 14 'VBELN_C'            'Cancelled Billing'              ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 15 'VKORG'              'Sales Organization'              ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 16 'VKORG_DESC'         'Sales Organization Description '                     ''  '' 'C' 'X'  ''  '' '',
+*******                 FILL_FLDCAT USING 17 'FKART'              'Billing Type'               ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 18 'FKART_DESC'         'Billing Type Description'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 19 'PSTYV'              'ITEM CATEGORY'                 ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 20 'VKBUR'              'Sales Office'               ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 21 'VKBUR_DESC'         'Sales Office Description'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 22 'NET_WEIGHT'         'Net Weight'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 18 'NET_WEIGHT_TON'     'Net Weight - TON'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 22 'GEWEI'              'Weight Unit'                   ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 23 'WERKS'              'Plant'               ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 24 'SHIP_TO_PARTY'      'Ship To Party Code'             ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 25 'SHIP_N'             'ShipTo Party Name'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 26 'MATNR'              'Material'               ''  '' 'C' 'X'  '18' '' '',
+******                 FILL_FLDCAT USING 29 'ARKTX'              'Material Description'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 30 'MONTH'              'Month and Year'               ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 31 'GROSS_WEIGHT'       'Gross Weight'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 32 'LGORT'              'Storage Location'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 34 'KURSK'              'Exchange Rate'               ''  '' 'C' 'X'  '' '' '',
+******                 FILL_FLDCAT USING 35 'NET2'               'net val After Exchange Rate'               ''  '' 'C' 'X'  '' '' '',
+*******                 FILL_FLDCAT USING 36 'REGIO'              'Goverment'               ''  '' 'C' 'X'  '20' '' '',
+******                 FILL_FLDCAT USING 38 'BZIRK_AUFT'         'SALES District'               ''  '' 'C' 'X'  '20' '' '',
+******                 FILL_FLDCAT USING 41 'PLTYP'              'Price List'               ''  '' 'C' 'X'  '20' '' '',
+******                 FILL_FLDCAT USING 42 'PTEXT'              'Price List DESC.'               ''  '' 'C' 'X'  '20' '' '',
+******                  FILL_FLDCAT USING 42 'HSL'              'SELLING_COST'               ''  '' 'C' 'X'  '20' '' '',
+*******                        FILL_FLDCAT USING 42 'HSL'              'HSL'               ''  '' 'C' 'X'  '20' '' '',
+******
+*******                 FILL_FLDCAT USING 19 'QTY_BEGIN_INV' 'Beginning Inventory' ''  '' 'C' 'X'  '20' '' ''  ,
+*******
+*******                 FILL_FLDCAT USING 20 'QTY_ZUB' 'QTY Receipts Procurement' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 20 'QTY_ZUBF' 'QTY Receipts Production' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 20 'QTY_ZUBB' 'QTY Receipts Purchase order' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 20 'QTY_ZUBU' 'QTY Receipts Stock transfer' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 20 'QTY_ZUBUBM' 'QTY Receipts Material tansfer posting' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 20 'QTY_ZUBL' 'QTY Receipts Subcontracting' ''  '' 'C' 'X'  '20' '' ''  ,
+*******
+*******                 FILL_FLDCAT USING 21 'QTY_RECEIPTS' 'Total Receipts' ''  '' 'C' 'X'  '20' '' ''  ,
+*******
+*******
+*******                 FILL_FLDCAT USING 22 'QTY_VNV' 'QTY Consumption' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 22 'QTY_VNVEAU' 'QTY Consumption orders' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 22 'QTY_VNVF' 'QTY Consumption Production' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 22 'QTY_VNVK' 'QTY Consumption Cost center' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 22 'QTY_VNVU' 'QTY Consumption Stock transfer' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 22 'QTY_VUBM' 'QTY Cons. Mat. tansfer posting' ''  '' 'C' 'X'  '20' '' ''  ,
+*******
+*******
+******                 FILL_FLDCAT USING 23 'QTY_CONSUMPTION' 'Sold QTY' ''  '' 'C' 'X'  '10' '' ''  ,
+*******                 FILL_FLDCAT USING 23 'TOT_NETWR' 'TOT_NETWR' ''  '' 'C' 'X'  '10' '' ''  ,
+******
+******                 FILL_FLDCAT USING 23 'QTY_TON' 'Sold QTY TON'  ''    ''  'C' 'X'  '10'  '' '' ,
+******                 FILL_FLDCAT USING 23 'WIGHT' 'WIGHT'  ''    ''  'C' 'X'  '10'  '' '' ,
+*******
+*******                 FILL_FLDCAT USING 24 'QTY_END_INV' 'Ending Inventory' ''  '' 'C' 'X'  '20' '' ''  ,
+******
+******
+******
+*******                 FILL_FLDCAT USING 20 'QTY_REVALUATION' 'QTY Production' ''  '' 'C' 'X'  '20' '' ''  ,
+*******
+*******                 FILL_FLDCAT USING 22 'QTY_CONSUMPTION' 'QTY CONSUMPTION' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 23 'QTY_CONS_PROD' 'QTY CONSUMPTION PRODCTION' ''  '' 'C' 'X'  '20' '' ''  ,
+*******                 FILL_FLDCAT USING 24 'QTY_STRANSFER' 'QTY Stock transfer' ''  '' 'C' 'X'  '20' '' ''  ,
+******
+******                 FILL_FLDCAT USING 43 'TOTAL' 'الاجمالي' ''  '' 'C' 'X'  '20' '' ''  .
+******
+******
+******
+******
+******
+******
+******
+******
+******
+******
+*******BREAK Malabsi.
+******CLEAR: ELEMT ,EL_HV , TXELE.
+******if  FUCOST = 'X'.
+****** SELECT  TCKH3~ELEMT , TCKH3~EL_HV , TCKH1~TXELE INTO ( @ELEMT , @EL_HV , @TXELE )
+******   FROM TCKH3
+******   LEFT OUTER JOIN TCKH1 on ( TCKH1~ELEHK = TCKH3~ELEHK AND  TCKH1~ELEMT = TCKH3~ELEMT AND TCKH1~SPRAS = @SPRAS )
+******   WHERE TCKH3~ELEHK = 'M0'
+******   order by TCKH3~ELEMT .
+******
+******    cond = 'KST' && EL_HV.
+******     INVTXT = ELEMT && ' _ ' && TXELE.
+******     PERFORM : FILL_FLDCAT USING 42  cond INVTXT ''  '' 'C' 'X'  '15' '' ''.
+******
+******    CLEAR: ELEMT ,EL_HV , TXELE.
+******  ENDSELECT.
+******ELSEIF  FIXCOST = 'X'.
+****** SELECT  TCKH3~ELEMT , TCKH3~EL_HF as EL_HV , TCKH1~TXELE INTO ( @ELEMT , @EL_HV , @TXELE )
+******   FROM TCKH3
+******   LEFT OUTER JOIN TCKH1 on ( TCKH1~ELEHK = TCKH3~ELEHK AND  TCKH1~ELEMT = TCKH3~ELEMT AND TCKH1~SPRAS = @SPRAS )
+******   WHERE TCKH3~ELEHK = 'M0'
+******   order by TCKH3~ELEMT .
+******
+******    cond = 'KST' && EL_HV.
+******     INVTXT = ELEMT && ' _ ' && TXELE.
+******     PERFORM : FILL_FLDCAT USING 42  cond INVTXT ''  '' 'C' 'X'  '15' '' ''.
+******
+******    CLEAR: ELEMT ,EL_HV , TXELE.
+******  ENDSELECT.
+******endif.
+******
+******
+******
+******ENDFORM.                    " BUIILD_FIELDCATALOG
+******
+******
+*******&---------------------------------------------------------------------*
+*******&      Form  FILL_FLDCAT
+*******&---------------------------------------------------------------------*
+******FORM FILL_FLDCAT  USING P TYPE I
+******                        P_FLD
+******                        P_TXT
+******                        P_SUM
+******                        P_KEY
+******                        P_JUST
+******                        P_ZERO
+******                        p_LEN
+******                        P_CHK
+******                        P_EDIT.
+******  CLEAR GS_FLDCAT.
+******  GS_FLDCAT-COL_POS   = P.
+******  GS_FLDCAT-FIELDNAME = P_FLD.
+******  GS_FLDCAT-TABNAME   = 'ITAB_ALV'."'itab_alv'.
+******  GS_FLDCAT-SELTEXT_L = P_TXT.
+******  GS_FLDCAT-DO_SUM    = P_SUM.
+******  GS_FLDCAT-KEY       = P_KEY.
+******  GS_FLDCAT-JUST      = P_JUST.
+******  GS_FLDCAT-NO_ZERO   = P_ZERO.
+******  GS_FLDCAT-outputlen = P_LEN.
+******  GS_FLDCAT-emphasize = 'X'.
+******  GS_FLDCAT-CHECKBOX  = P_CHK.
+******  GS_FLDCAT-EDIT      = P_EDIT.
+******  APPEND GS_FLDCAT TO GT_FLDCAT.
+******
+******
+******
+******ENDFORM.                    " FILL_FLDCAT
+******
+******
+*******&-------------------------------------------------------------------
+******
+*******-------------------------------------------------------------------*
+******* Form  TOP-OF-PAGE                                                 *
+*******-------------------------------------------------------------------*
+******* ALV Report Header                                                 *
+******FORM TOP-OF-PAGE.
+*******ALV Header declarations
+******  DATA: T_HEADER TYPE SLIS_T_LISTHEADER,
+******        WA_HEADER TYPE SLIS_LISTHEADER,
+******        T_LINE LIKE WA_HEADER-INFO,
+******        LD_LINES TYPE I,
+******        LD_LINESC(10) TYPE C.
+******
+******
+******
+******* DATA: Comp_Name TYPE char300.
+*******
+*******  SELECT SINGLE ADRC~NAME2 INTO Comp_Name from ADRC
+*******  INNER JOIN  T001 ON ADRC~ADDRNUMBER = T001~ADRNR
+*******  WHERE  T001~BUKRS = comp.
+*******
+*******
+********   Title1
+*******  WA_HEADER-TYP  = 'H'.
+*******  WA_HEADER-INFO = Comp_Name.
+*******  APPEND WA_HEADER TO T_HEADER.
+*******  CLEAR WA_HEADER.
+******* Title
+******  WA_HEADER-TYP  = 'H'.
+******  WA_HEADER-INFO = 'Cost Components Standard & Actual'.
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR WA_HEADER.
+******
+******
+******
+*******  * Date
+******  WA_HEADER-TYP  = 'S'.
+******  WA_HEADER-KEY = 'تاريخ الطباعة: '.
+******  CONCATENATE  SY-DATUM+6(2) '.' SY-DATUM+4(2) '.'  SY-DATUM(4) INTO WA_HEADER-INFO.   "todays date
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+*******  User
+******  WA_HEADER-TYP  = 'S'.
+******  WA_HEADER-KEY = 'المستخدم: '.
+******  WA_HEADER-INFO = SY-UNAME.   "todays date
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+******
+******
+******  WA_HEADER-TYP  = 'S'.
+******  WA_HEADER-KEY = 'الشركة : '.
+******  CONCATENATE  'From :' COMP-LOW  ' To :'  COMP-HIGH  INTO WA_HEADER-INFO.
+******  if WA_HEADER-INFO =  'From : To :'  .
+******    WA_HEADER-INFO = 'All'.
+******  ENDIF.
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+******
+******  WA_HEADER-TYP  = 'S'.
+******  WA_HEADER-KEY = 'الفرع : '.
+******  CONCATENATE  'From :' BWKEY-LOW  ' To :'  BWKEY-HIGH  INTO WA_HEADER-INFO.
+******  if WA_HEADER-INFO =  'From : To :'  .
+******    WA_HEADER-INFO = 'All'.
+******  ENDIF.
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+******
+******
+******  WA_HEADER-TYP  = 'S'.
+******  WA_HEADER-KEY = 'الاصناف : '.
+******  CONCATENATE  'From :' MATNR-LOW  ' To :'  MATNR-HIGH  INTO WA_HEADER-INFO.
+******  if WA_HEADER-INFO =  'From : To :'  .
+******    WA_HEADER-INFO = 'All'.
+******  ENDIF.
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+******
+******
+******  WA_HEADER-TYP  = 'S'.
+******  WA_HEADER-KEY = 'النوع : '.
+******  CONCATENATE  'From :' MTART-LOW  ' To :'  MTART-HIGH  INTO WA_HEADER-INFO.
+******  if WA_HEADER-INFO =  'From : To :'  .
+******    WA_HEADER-INFO = 'All'.
+******  ENDIF.
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+******
+******
+******  WA_HEADER-TYP  = 'S'.
+******  CONCATENATE  'Year : ' BDATJ '.' ' Month : ' POPER  INTO WA_HEADER-INFO.
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+******
+******
+******
+******  WA_HEADER-TYP  = 'S'.
+******  WA_HEADER-KEY = 'Curr Type : '.
+******  WA_HEADER-INFO = CURTP.
+******  APPEND WA_HEADER TO T_HEADER.
+******  CLEAR: WA_HEADER.
+******
+******
+*******  ********" LOGO
+******  CALL FUNCTION 'REUSE_ALV_COMMENTARY_WRITE'
+******    EXPORTING
+*******      i_logo             = '' "comp
+******      it_list_commentary = t_header.
+***************" LOGO
+******
+******ENDFORM.                    "top-of-p
+*******&---------------------------------------------------------------------*
+*******&---------------------------------------------------------------------*
+******
+*******&-------------------------------------------------------------------
+
+
+
 *&---------------------------------------------------------------------*
 *& Report ZPL_REPORT4 By Shady Almurish
 *&---------------------------------------------------------------------*
@@ -13,7 +2373,7 @@ REPORT ZPL_REPORT5.
 *&---------------------------------------------------------------------*
 
 TABLES: BSEG , MARA , MBEW , CKMLPRKEPH , TCKH3, CKMLCUR.
-  TYPE-POOLS : SLIS, ABAP.
+  TYPE-POOLS : SLIS.
 *&---------------------------------------------------------------------*
 DATA:fc       TYPE slis_t_fieldcat_alv,
      prog     TYPE syst-repid,
@@ -218,11 +2578,12 @@ TYPES: BEGIN OF ty_alv_key,
          matnr       TYPE mara-matnr,
          fiscyearper TYPE acdoca-fiscyearper,
          ekorg       TYPE t001w-ekorg,
+
        END OF ty_alv_key.
 
-DATA: lt_alv_keys TYPE HASHED TABLE OF ty_alv_key WITH UNIQUE KEY matnr fiscyearper ekorg,
+DATA: lt_alv_keys TYPE HASHED TABLE OF ty_alv_key WITH UNIQUE KEY matnr fiscyearper ekorg ,
       ls_alv_key TYPE ty_alv_key,
-      lt_missing_materials TYPE HASHED TABLE OF str_ALV WITH UNIQUE KEY matnr fiscyearper ekorg,
+      lt_missing_materials TYPE HASHED TABLE OF str_ALV WITH UNIQUE KEY matnr fiscyearper ekorg ,
       ls_missing TYPE str_ALV.
 
 DATA: indx TYPE SY-TABIX,
@@ -480,8 +2841,8 @@ FORM load_data.
    SELECT          ACDOCA~RBUKRS as EKORG,
                    ACDOCA~matnr ,
                    ACDOCA~FISCYEARPER,
-                  " ACDOCA~RACCT ,
-                  " SKAT~TXT50,
+*                   ACDOCA~RACCT ,
+*                   SKAT~TXT50,
 
                    "ACDOCA~RLDNR,
                   sum( ACDOCA~HSL ) as HSL
@@ -504,19 +2865,19 @@ FORM load_data.
                                                   '6100060000', '5720010000' )
          AND ACDOCA~RBUKRS in @COMP
 
-         GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS
+         GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS. ", TXT50. ", ACDOCA~RACCT .
       .
-         
-         
-      
+
+
+
 
 
 
       SELECT          ACDOCA~RBUKRS as EKORG,
                    ACDOCA~matnr ,
                    ACDOCA~FISCYEARPER,
-                  " ACDOCA~RACCT ,
-                  " SKAT~TXT50,
+*                   ACDOCA~RACCT ,
+*                   SKAT~TXT50,
 
                    "ACDOCA~RLDNR,
                   sum( ACDOCA~HSL ) as NET
@@ -540,7 +2901,7 @@ FORM load_data.
                                                   '4100030000', '4100070000', '4100080000', '4100110000', '4105080000', '4100100000' )
          AND ACDOCA~RBUKRS in @COMP
 
-         GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS
+         GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS. ", ACDOCA~RACCT." , SKAT~TXT50. ", SKAT~TXT50.
 
 
       .
@@ -654,34 +3015,36 @@ FORM load_data.
 
 
       LOOP AT ITAB_ALV ASSIGNING FIELD-SYMBOL(<WA_ALV>).
-        DATA(lv_found_alv2) TYPE abap_bool VALUE abap_false.
-        DATA(lv_found_net)  TYPE abap_bool VALUE abap_false.
-
-        CLEAR WA_ITAB.
         READ TABLE ITAB_ALV2 INTO WA_ITAB WITH KEY MATNR = <WA_ALV>-MATNR
                                                    BDATJ = <WA_ALV>-FISCYEARPER(4)
                                                    POPER = <WA_ALV>-FISCYEARPER+4(3)
                                                    EKORG = <WA_ALV>-EKORG.
-        IF sy-subrc = 0.
-          lv_found_alv2 = abap_true.
-          WA_ITAB-EKORG = <WA_ALV>-EKORG.
-          WA_ITAB-FISCYEARPER = <WA_ALV>-FISCYEARPER.
-          WA_ITAB-HSL = <WA_ALV>-HSL.
-        ENDIF.
 
-        CLEAR WA_ITAB_NET.
+
+        WA_ITAB-EKORG = <WA_ALV>-EKORG.
+        WA_ITAB-FISCYEARPER = <WA_ALV>-FISCYEARPER.
+        WA_ITAB-HSL = <WA_ALV>-HSL.
+
+         CLEAR WA_ITAB_NET.
+
+
         READ TABLE ITAB_ALV_NET INTO WA_ITAB_NET WITH KEY MATNR = <WA_ALV>-MATNR
                                                           FISCYEARPER(4) = <WA_ALV>-FISCYEARPER(4)
                                                           FISCYEARPER+4(3) = <WA_ALV>-FISCYEARPER+4(3)
-                                                                 EKORG = <WA_ALV>-EKORG.
-        IF sy-subrc = 0.
-          lv_found_net = abap_true.
-          WA_ITAB-NET = WA_ITAB_NET-NET.
-        ENDIF.
+                                                                 EKORG = <WA_ALV>-EKORG
+                                                                .
 
-        IF lv_found_alv2 = abap_true OR lv_found_net = abap_true.
-          MOVE-CORRESPONDING WA_ITAB TO <WA_ALV>.
-        ENDIF.
+
+*        <WA_ALV>-NET_WEIGHT = WA_ITAB_WEIGHT-NET_WEIGHT.
+*         <WA_ALV>-NET = WA_ITAB_NET-NET.
+*         WA_ITAB-RACCT = WA_ITAB_NET-RACCT.
+*        WA_ITAB-TXT50 = WA_ITAB_NET-TXT50.
+         WA_ITAB-NET = WA_ITAB_NET-NET.
+
+
+        MOVE-CORRESPONDING WA_ITAB to <WA_ALV>.
+         Clear WA_ITAB_NET.
+         clear WA_ITAB.
 
       ENDLOOP.
 
@@ -690,7 +3053,12 @@ FORM load_data.
         ls_alv_key-matnr = WA_ITAB-matnr.
         ls_alv_key-fiscyearper = WA_ITAB-fiscyearper.
         ls_alv_key-ekorg = WA_ITAB-ekorg.
+
+*        ls_alv_key-racct = WA_ITAB-racct.
+*        ls_alv_key-TXT50 = WA_ITAB-TXT50.
+        .
         INSERT ls_alv_key INTO TABLE lt_alv_keys.
+
       ENDLOOP.
 
       LOOP AT ITAB_ALV_NET INTO WA_ITAB_NET.
@@ -711,7 +3079,7 @@ FORM load_data.
             IF sy-subrc <> 0.
               ls_missing-matnr = WA_ITAB_NET-matnr.
               ls_missing-ekorg = WA_ITAB_NET-ekorg.
-              ls_missing-fiscyearper = WA_ITAB_NET-fiscyearper.
+*              ls_missing-fiscyearper = WA_ITAB_NET-fiscyearper.
               ls_missing-bdatj = WA_ITAB_NET-fiscyearper(4).
               ls_missing-poper = WA_ITAB_NET-fiscyearper+4(3).
             ELSE.
@@ -721,7 +3089,7 @@ FORM load_data.
             INSERT ls_missing INTO TABLE lt_missing_materials.
           ELSE.
             ls_missing-net = ls_missing-net + WA_ITAB_NET-net.
-            MODIFY lt_missing_materials FROM ls_missing.
+            MODIFY table lt_missing_materials FROM ls_missing.
           ENDIF.
         ENDIF.
       ENDLOOP.
@@ -2115,8 +4483,9 @@ FORM BUIILD_FIELDCATALOG .
                  FILL_FLDCAT USING 2  'NAME2' 'Ciompany Name' ''  '' 'C' 'X'  '20' '' '',
                  fill_fldcat USING  2 'wert2'              'PRODUCT HIR5'                     ''  '' 'C' 'X'  ''  '' '',
                  FILL_FLDCAT USING 3  'BWKEY' 'المصنع' ''  '' 'C' 'X'  '8' '' '',
-                 FILL_FLDCAT USING 3  'RACCT' 'الGL' ''  '' 'C' 'X'  '8' '' '',
-                 FILL_FLDCAT USING 3  'RLDNR' 'الGL2' ''  '' 'C' 'X'  '8' '' '',
+                 FILL_FLDCAT USING 3  'RACCT' 'GL/ACCOUNT' ''  '' 'C' 'X'  '8' '' '',
+                 FILL_FLDCAT USING 3  'TXT50' 'GL Describtion' ''  '' 'C' 'X'  '8' '' '',
+*                 FILL_FLDCAT USING 3  'RLDNR' 'الGL2' ''  '' 'C' 'X'  '8' '' '',
 
 *                 FILL_FLDCAT USING 4  'NAME1' 'Plant Name' ''  '' 'C' 'X'  '20' '' '',
 
