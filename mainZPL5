@@ -1,5 +1,5 @@
 *&---------------------------------------------------------------------*
-*& Report ZPL_REPORT5 By Shady Almurish
+*& Report ZPL_REPORT4 By Shady Almurish
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
@@ -206,8 +206,10 @@ TYPES: BEGIN OF str_ALV,
 
 DATA: ITAB_ALV TYPE STANDARD TABLE OF str_ALV ,
       ITAB_ALV2 TYPE STANDARD TABLE OF str_ALV ,
+      ITAB_ALV_NET TYPE STANDARD TABLE OF str_ALV ,
       ITAB_ALV_RESULT TYPE STANDARD TABLE OF str_ALV ,
       WA_ITAB TYPE  str_ALV,
+      WA_ITAB_NET TYPE  str_ALV,
       WA_ITAB_last TYPE  str_ALV,
       WA_ITAB_DIFF TYPE  str_ALV,
       WA_ITAB_PRCENT TYPE  str_ALV.
@@ -482,8 +484,6 @@ FORM load_data.
           LEFT  JOIN SKAT AS SKAT ON  SKAT~SAKNR = ACDOCA~RACCT
                           AND SKAT~SPRAS = 'E'
                           AND ( SKAT~KTOPL = 'OCOA'  or SKAT~KTOPL = '1000' )
-
-
              WHERE
          ACDOCA~FISCYEARPER in @MONTH_YAER " = '2023012'
          AND ACDOCA~RACCT IN ( '4100060000', '4100040000', '6010080000', '6010080001', '6010010000',
@@ -491,6 +491,42 @@ FORM load_data.
                                                   '4105040000', '4105060000', '4105090000', '6010120000', '6015010000',
                                                   '6015020000', '6100030000', '4100090000', '6100010000', '6100020000',
                                                   '6100060000', '5720010000' )
+         AND ACDOCA~RBUKRS in @COMP
+
+         GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS
+      .
+         
+         
+      
+
+
+
+      SELECT          ACDOCA~RBUKRS as EKORG,
+                   ACDOCA~matnr ,
+                   ACDOCA~FISCYEARPER,
+                  " ACDOCA~RACCT ,
+                  " SKAT~TXT50,
+
+                   "ACDOCA~RLDNR,
+                  sum( ACDOCA~HSL ) as NET
+
+     INTO CORRESPONDING FIELDS OF TABLE @ITAB_ALV_NET
+              FROM ACDOCA
+*              LEFT OUTER JOIN VBRK ON ACDOCA~BELNR  = VBRK~BELNR AND ACDOCA~RBUKRS = VBRK~BUKRS AND ACDOCA~GJAHR  = VBRK~GJAHR
+*              LEFT JOIN  VBRP  ON VBRP~VBELN  = VBRK~VBELN AND ACDOCA~AWITEM = VBRP~POSNR
+
+
+          LEFT  JOIN SKAT AS SKAT ON  SKAT~SAKNR = ACDOCA~RACCT
+                          AND SKAT~SPRAS = 'E'
+                          AND ( SKAT~KTOPL = 'OCOA'  or SKAT~KTOPL = '1000' )
+
+
+             WHERE
+         ACDOCA~FISCYEARPER in @MONTH_YAER " = '2023012'
+         AND ACDOCA~RACCT IN ( '4010010000', '4020010000', '4020030000', '4050010000', '4040020000', '4040010000',
+                                                  '4045010000', '4070010000', '4015010000', '4055010000', '4025010000', '4030010000',
+                                                  '4035010000', '4035030000', '4040040000', '4060010000', '4065010000', '4070040000',
+                                                  '4100030000', '4100070000', '4100080000', '4100110000', '4105080000', '4100100000' )
          AND ACDOCA~RBUKRS in @COMP
 
          GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS
@@ -612,9 +648,24 @@ FORM load_data.
                                                    POPER = <WA_ALV>-FISCYEARPER+4(3)
                                                    EKORG = <WA_ALV>-EKORG.
 
+
         WA_ITAB-EKORG = <WA_ALV>-EKORG.
         WA_ITAB-FISCYEARPER = <WA_ALV>-FISCYEARPER.
         WA_ITAB-HSL = <WA_ALV>-HSL.
+         CLEAR WA_ITAB_NET.
+
+
+        READ TABLE ITAB_ALV_NET INTO WA_ITAB_NET WITH KEY MATNR = <WA_ALV>-MATNR
+                                                          FISCYEARPER(4) = <WA_ALV>-FISCYEARPER(4)
+                                                          FISCYEARPER+4(3) = <WA_ALV>-FISCYEARPER+4(3)
+                                                                 EKORG = <WA_ALV>-EKORG.
+
+
+*        <WA_ALV>-NET_WEIGHT = WA_ITAB_WEIGHT-NET_WEIGHT.
+*         <WA_ALV>-NET = WA_ITAB_NET-NET.
+         WA_ITAB-NET = WA_ITAB_NET-NET.
+
+
         MOVE-CORRESPONDING WA_ITAB to <WA_ALV>.
 
 
@@ -697,7 +748,7 @@ FORM load_data.
                 ENDIF.
 
                 WA_ITAB-QTY_CONSUMPTION = WA_ITAB-QTY_CONSUMPTION + <SD_WA>-FKLMG .
-                WA_ITAB-TOT_NETWR = WA_ITAB-TOT_NETWR + <SD_WA>-NETWR .
+*                WA_ITAB-TOT_NETWR = WA_ITAB-TOT_NETWR + <SD_WA>-NETWR .
 
                 IF WA_ITAB-PLTYP IS INITIAL.
                    WA_ITAB-PLTYP = <SD_WA>-PLTYP.
