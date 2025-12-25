@@ -2898,15 +2898,14 @@ FORM load_data.
          AND ACDOCA~RACCT IN ( '4010010000', '4020010000', '4020030000', '4050010000', '4040020000', '4040010000',
                                                   '4045010000', '4070010000', '4015010000', '4055010000', '4025010000', '4030010000',
                                                   '4035010000', '4035030000', '4040040000', '4060010000', '4065010000', '4070040000',
-                                                  '4100030000', '4100070000', '4100080000', '4100110000', '4105080000', '4100100000' )
+                                                  '4100030000', '4100070000', '4100080000', '4100110000', '4105080000', '4100100000', '4120020000' )
          AND ACDOCA~RBUKRS in @COMP
 
          GROUP BY ACDOCA~FISCYEARPER, ACDOCA~matnr,  ACDOCA~RBUKRS. ", ACDOCA~RACCT." , SKAT~TXT50. ", SKAT~TXT50.
-
-
       .
-
-
+      
+      
+      
 
 
         SELECT MARA~MATNR ,MARA~MATKL  ,MARA~MTART ,T023T~WGBEZ ,MAKT~MAKTG,KEKO~MEINS,"MARA~MEINS,
@@ -3101,6 +3100,7 @@ FORM load_data.
 
 
 
+
        "1101 mahdi
 *
 
@@ -3128,6 +3128,7 @@ FORM load_data.
 
             select VBRP~NETWR,
               VBRP~FKLMG,
+              VBRP~VBELN,
                VBRP~AUTYP,
                VF_STATUS_ANA ,
               VBRP~PLTYP_AUFT AS PLTYP,
@@ -3149,7 +3150,15 @@ FORM load_data.
                    CLEAR VKBUR .
                    CONCATENATE '410' WA_ITAB-BWKEY+3(1) into VKBUR.
 
-                   select VBRP~NETWR, VBRP~FKLMG, VBRP~AUTYP, VF_STATUS_ANA
+                   select VBRP~NETWR,
+                      VBRP~FKLMG,
+                     VBRP~VBELN,
+                      VBRP~AUTYP,
+                     VF_STATUS_ANA ,
+                       VBRP~PLTYP_AUFT AS PLTYP,
+                      VBRP~VTWEG_ANA,
+                       VBRP~VKBUR,
+                        vbrp~vkorg_auft
                      APPENDING TABLE @SD_TAB
                      from VBRP
                      WHERE VBRP~AUTYP IN ( 'V' , 'C' , 'I' , 'H', 'K' )
@@ -3205,8 +3214,8 @@ FORM load_data.
                 SELECT SINGLE PTEXT
                   FROM t189t
                  WHERE
-                  "SPRAS = 'EN'
-                   PLTYP = @WA_ITAB-PLTYP
+*                  SPRAS = 'EN'
+                  PLTYP = @WA_ITAB-PLTYP
                   INTO @WA_ITAB-PTEXT.
               ENDIF.
 
